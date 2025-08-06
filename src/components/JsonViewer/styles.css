@@ -1,0 +1,428 @@
+.json-container {
+  font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #2d3748;
+  background: #ffffff;
+}
+
+.json-toggle {
+  cursor: pointer;
+  user-select: none;
+  color: #4a5568;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  outline: none;
+  position: relative;
+}
+
+.json-toggle:hover {
+  background-color: #edf2f7;
+  color: #2d3748;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.json-toggle:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.json-toggle:focus {
+  box-shadow: 0 0 0 2px #4299e1;
+  background-color: #bee3f8;
+}
+
+.json-content {
+  border-left: 2px solid #e2e8f0;
+  padding-left: 16px;
+  margin-left: 8px;
+  margin-top: 4px;
+  position: relative;
+  overflow: hidden;
+}
+
+.json-content-animated {
+  animation: expandIn 0.2s ease-out;
+}
+
+@keyframes expandIn {
+  from {
+    opacity: 0;
+    max-height: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    max-height: 1000px;
+    transform: translateY(0);
+  }
+}
+
+.json-content::before {
+  content: '';
+  position: absolute;
+  left: -2px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, #4299e1, #63b3ed);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.json-content:hover::before {
+  opacity: 1;
+}
+
+.json-item {
+  margin: 3px 0;
+  padding: 2px 0;
+  border-radius: 3px;
+  transition: all 0.15s ease;
+  position: relative;
+}
+
+.json-item:hover {
+  background-color: #f7fafc;
+  padding-left: 4px;
+  margin-left: -4px;
+  transform: translateX(2px);
+}
+
+.json-key {
+  color: #805ad5;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(128, 90, 213, 0.1);
+}
+
+.array-index {
+  color: #3182ce;
+  font-weight: 500;
+}
+
+.object-key {
+  color: #805ad5;
+}
+
+.json-string {
+  color: #38a169;
+  font-weight: 400;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.json-string:hover {
+  background-color: rgba(56, 161, 105, 0.1);
+  border-radius: 3px;
+  padding: 1px 3px;
+  margin: -1px -3px;
+}
+
+.json-string::before,
+.json-string::after {
+  color: #68d391;
+  font-weight: 500;
+}
+
+.json-number {
+  color: #3182ce;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  position: relative;
+}
+
+.json-number:hover {
+  background-color: rgba(49, 130, 206, 0.1);
+  border-radius: 3px;
+  padding: 1px 3px;
+  margin: -1px -3px;
+}
+
+.json-boolean {
+  color: #e53e3e;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  position: relative;
+}
+
+.json-boolean:hover {
+  background-color: rgba(229, 62, 62, 0.1);
+  border-radius: 3px;
+  padding: 1px 3px;
+  margin: -1px -3px;
+}
+
+.json-null {
+  color: #a0aec0;
+  font-style: italic;
+  font-weight: 500;
+  text-transform: lowercase;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.json-null:hover {
+  background-color: rgba(160, 174, 192, 0.1);
+  border-radius: 3px;
+  padding: 1px 3px;
+  margin: -1px -3px;
+}
+
+.json-undefined {
+  color: #a0aec0;
+  font-style: italic;
+  font-weight: 500;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.json-undefined:hover {
+  background-color: rgba(160, 174, 192, 0.1);
+  border-radius: 3px;
+  padding: 1px 3px;
+  margin: -1px -3px;
+}
+
+.json-empty {
+  color: #718096;
+  font-style: italic;
+  font-weight: 400;
+  opacity: 0.8;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.json-empty:hover {
+  background-color: rgba(113, 128, 150, 0.1);
+  border-radius: 3px;
+  padding: 1px 3px;
+  margin: -1px -3px;
+}
+
+/* 类型图标样式 */
+.type-icon {
+  font-size: 10px;
+  opacity: 0.7;
+  margin-right: 4px;
+  font-weight: bold;
+  color: #718096;
+}
+
+.expand-icon {
+  font-size: 10px;
+  margin-right: 4px;
+  transition: transform 0.2s ease;
+  color: #4a5568;
+}
+
+.json-toggle:hover .expand-icon {
+  transform: scale(1.2);
+}
+
+.item-count {
+  font-size: 11px;
+  color: #718096;
+  font-weight: normal;
+}
+
+.object-name {
+  color: #4a5568;
+  font-weight: 600;
+}
+
+/* 复制提示样式 */
+.copy-hint {
+  font-size: 10px;
+  margin-left: 6px;
+  opacity: 0.6;
+  animation: fadeIn 0.2s ease;
+}
+
+.copy-hint-toggle {
+  font-size: 10px;
+  opacity: 0;
+  margin-left: auto;
+  transition: opacity 0.2s ease;
+}
+
+.json-toggle:hover .copy-hint-toggle {
+  opacity: 0.6;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 0.6; }
+}
+
+/* 复制成功提示弹窗 */
+.copy-tooltip {
+  position: fixed;
+  background: #38a169;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  z-index: 10000;
+  pointer-events: none;
+  animation: tooltipFade 1s ease forwards;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes tooltipFade {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  20% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  80% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+/* 根容器样式 */
+.json-viewer-root {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  max-height: 500px;
+  overflow-y: auto;
+  position: relative;
+}
+
+.json-viewer-root::before {
+  content: '💾 右键任意元素可复制 · ⌨️ 支持键盘导航';
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(90deg, #4299e1, #63b3ed);
+  color: white;
+  font-size: 10px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  margin: -16px -16px 12px -16px;
+  text-align: center;
+  opacity: 0.9;
+  font-weight: 500;
+}
+
+.json-viewer-root::-webkit-scrollbar {
+  width: 8px;
+}
+
+.json-viewer-root::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+.json-viewer-root::-webkit-scrollbar-thumb {
+  background: #cbd5e0;
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+.json-viewer-root::-webkit-scrollbar-thumb:hover {
+  background: #a0aec0;
+}
+
+/* 键盘导航辅助样式 */
+.json-toggle[tabindex]:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #4299e1, 0 0 0 4px rgba(66, 153, 225, 0.3);
+}
+
+/* 深色主题支持 */
+@media (prefers-color-scheme: dark) {
+  .json-container {
+    color: #e2e8f0;
+    background: #1a202c;
+  }
+  
+  .json-toggle {
+    color: #a0aec0;
+  }
+  
+  .json-toggle:hover {
+    background-color: #2d3748;
+    color: #e2e8f0;
+  }
+  
+  .json-toggle:focus {
+    background-color: #2b6cb0;
+    box-shadow: 0 0 0 2px #63b3ed;
+  }
+  
+  .json-content {
+    border-left-color: #4a5568;
+  }
+  
+  .json-item:hover {
+    background-color: #2d3748;
+  }
+  
+  .json-key {
+    color: #b794f6;
+  }
+  
+  .json-string {
+    color: #68d391;
+  }
+  
+  .json-string:hover {
+    background-color: rgba(104, 211, 145, 0.1);
+  }
+  
+  .json-number {
+    color: #63b3ed;
+  }
+  
+  .json-number:hover {
+    background-color: rgba(99, 179, 237, 0.1);
+  }
+  
+  .json-boolean {
+    color: #fc8181;
+  }
+  
+  .json-boolean:hover {
+    background-color: rgba(252, 129, 129, 0.1);
+  }
+  
+  .json-viewer-root {
+    background: #1a202c;
+    border-color: #4a5568;
+  }
+  
+  .json-viewer-root::before {
+    background: linear-gradient(90deg, #2b6cb0, #3182ce);
+  }
+  
+  .copy-tooltip {
+    background: #48bb78;
+  }
+} 

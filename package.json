@@ -1,0 +1,39 @@
+{
+  "name": "redirect-wizard",
+  "version": "0.1.0",
+  "description": "一个专为前端开发者设计的Chrome浏览器插件，用于API请求重定向和调试，让前后端联调变得更加便捷高效。",
+  "main": "index.js",
+  "scripts": {
+    "build": "webpack --mode production && esno scripts/prepare.js",
+    "build:prepare": "esno scripts/prepare.js",
+    "watch": "webpack --mode production --watch"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.22.0",
+    "@babel/preset-env": "^7.22.0",
+    "@babel/preset-react": "^7.22.0",
+    "@types/fs-extra": "^11.0.4",
+    "@types/webextension-polyfill": "^0.12.3",
+    "@unocss/reset": "^66.1.1",
+    "@unocss/vite": "^66.1.1",
+    "@unocss/webpack": "^66.1.1",
+    "antd": "^5.25.1",
+    "babel-loader": "^9.1.2",
+    "babel-plugin-import": "^1.13.8",
+    "copy-webpack-plugin": "^13.0.0",
+    "core-js": "^3.44.0",
+    "css-loader": "^6.11.0",
+    "esno": "^4.8.0",
+    "fs-extra": "^11.3.0",
+    "kolorist": "^1.8.0",
+    "style-loader": "^3.3.4",
+    "unocss": "^66.1.1",
+    "webextension-polyfill": "^0.12.0",
+    "webpack": "^5.88.0",
+    "webpack-cli": "^5.1.4"
+  }
+}

@@ -1,0 +1,64 @@
+.request-list {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.request-list-header {
+  display: flex;
+  padding: 8px;
+  background: #f5f5f5;
+  border-bottom: 1px solid #ddd;
+}
+
+.method-col {
+  width: 80px;
+}
+
+.url-col {
+  flex: 1;
+}
+
+.status-col {
+  width: 60px;
+}
+
+.request-list-body {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.request-item {
+  display: flex;
+  padding: 8px;
+  border-bottom: 1px solid #eee;
+}
+
+.request-item .method {
+  width: 80px;
+  font-weight: bold;
+}
+
+.request-item .method.get { color: #61affe; }
+.request-item .method.post { color: #49cc90; }
+.request-item .method.put { color: #fca130; }
+.request-item .method.delete { color: #f93e3e; }
+
+.request-item .url {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.request-item .status {
+  width: 60px;
+  text-align: right;
+}
+
+.empty-message {
+  padding: 20px;
+  text-align: center;
+  color: #999;
+} 
