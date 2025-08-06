@@ -1,5 +1,5 @@
 {
-  "name": "redirect-wizard",
+  "name": "redirector",
   "version": "0.1.0",
   "description": "一个专为前端开发者设计的Chrome浏览器插件，用于API请求重定向和调试，让前后端联调变得更加便捷高效。",
   "main": "index.js",
