@@ -8,8 +8,8 @@ const FloatingWindow = () => {
   const [activeTab, setActiveTab] = useState('API');
   const [isVisible, setIsVisible] = useState(false);
   const [position, setPosition] = useState({
-    x: window.innerWidth - 70,
-    y: window.innerHeight - 70,
+    x: window.innerWidth - 50,
+    y: window.innerHeight - 50,
   });
   const [isDragging, setIsDragging] = useState(false);
 
@@ -148,7 +148,7 @@ const FloatingWindow = () => {
             className="floating-button"
             onClick={() => setIsVisible(!isVisible)}
           >
-            🔍
+            🔧
           </button>
         </div>
       }

@@ -1,16 +1,16 @@
 .floating-button {
-  width: 50px;
-  height: 50px;
+  width: 32px;
+  height: 32px;
   position: fixed !important;
-  bottom: 20px !important;
-  right: 20px !important;
-  background-color: #2196f3 !important;
-  border-radius: 50% !important;
+  right: 0px !important;
+  bottom: 0px !important;
+  background-color: #818181 !important;
+  border-radius: 20% !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
   cursor: grab !important;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2) !important;
   color: white !important;
   font-size: 24px !important;
   transition: all 0.2s ease-in-out !important;
