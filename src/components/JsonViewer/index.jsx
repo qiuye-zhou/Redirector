@@ -18,13 +18,13 @@ const JsonViewer = ({ src, name = 'root', expanded = true, depth = 0 }) => {
       tooltip.className = 'copy-tooltip';
       tooltip.textContent = '已复制!';
       document.body.appendChild(tooltip);
-      
+
       const rect = elementRef.current?.getBoundingClientRect();
       if (rect) {
         tooltip.style.left = `${rect.left}px`;
         tooltip.style.top = `${rect.top - 30}px`;
       }
-      
+
       setTimeout(() => {
         document.body.removeChild(tooltip);
       }, 1000);
@@ -61,7 +61,7 @@ const JsonViewer = ({ src, name = 'root', expanded = true, depth = 0 }) => {
   };
 
   if (src === null) return (
-    <span 
+    <span
       className="json-null"
       ref={elementRef}
       onContextMenu={handleContextMenu}
@@ -70,9 +70,9 @@ const JsonViewer = ({ src, name = 'root', expanded = true, depth = 0 }) => {
       <span className="type-icon">∅</span> null
     </span>
   );
-  
+
   if (src === undefined) return (
-    <span 
+    <span
       className="json-undefined"
       ref={elementRef}
       onContextMenu={handleContextMenu}
@@ -81,10 +81,10 @@ const JsonViewer = ({ src, name = 'root', expanded = true, depth = 0 }) => {
       <span className="type-icon">?</span> undefined
     </span>
   );
-  
+
   if (typeof src === 'string') {
     return (
-      <span 
+      <span
         className="json-string"
         ref={elementRef}
         onContextMenu={handleContextMenu}
@@ -97,10 +97,10 @@ const JsonViewer = ({ src, name = 'root', expanded = true, depth = 0 }) => {
       </span>
     );
   }
-  
+
   if (typeof src === 'number') {
     return (
-      <span 
+      <span
         className="json-number"
         ref={elementRef}
         onContextMenu={handleContextMenu}
@@ -113,10 +113,10 @@ const JsonViewer = ({ src, name = 'root', expanded = true, depth = 0 }) => {
       </span>
     );
   }
-  
+
   if (typeof src === 'boolean') {
     return (
-      <span 
+      <span
         className="json-boolean"
         ref={elementRef}
         onContextMenu={handleContextMenu}
@@ -132,7 +132,7 @@ const JsonViewer = ({ src, name = 'root', expanded = true, depth = 0 }) => {
 
   if (Array.isArray(src)) {
     if (src.length === 0) return (
-      <span 
+      <span
         className="json-empty"
         ref={elementRef}
         onContextMenu={handleContextMenu}
@@ -141,11 +141,11 @@ const JsonViewer = ({ src, name = 'root', expanded = true, depth = 0 }) => {
         <span className="type-icon">[]</span>[]
       </span>
     );
-    
+
     const content = (
       <div className="json-container">
-        <span 
-          className="json-toggle" 
+        <span
+          className="json-toggle"
           onClick={() => setIsExpanded(!isExpanded)}
           onKeyDown={handleKeyDown}
           tabIndex={0}
@@ -166,12 +166,12 @@ const JsonViewer = ({ src, name = 'root', expanded = true, depth = 0 }) => {
             {src.map((item, index) => (
               <div key={index} className="json-item">
                 <span className="json-key">
-                  <span className="array-index">[{index}]</span>: 
+                  <span className="array-index">[{index}]</span>:
                 </span>
-                <JsonViewer 
-                  src={item} 
-                  name={index.toString()} 
-                  expanded={depth < 2} 
+                <JsonViewer
+                  src={item}
+                  name={index.toString()}
+                  expanded={depth < 2}
                   depth={depth + 1}
                 />
               </div>
@@ -187,7 +187,7 @@ const JsonViewer = ({ src, name = 'root', expanded = true, depth = 0 }) => {
   if (typeof src === 'object') {
     const keys = Object.keys(src);
     if (keys.length === 0) return (
-      <span 
+      <span
         className="json-empty"
         ref={elementRef}
         onContextMenu={handleContextMenu}
@@ -196,11 +196,11 @@ const JsonViewer = ({ src, name = 'root', expanded = true, depth = 0 }) => {
         <span className="type-icon">{}</span>{}
       </span>
     );
-    
+
     const content = (
       <div className="json-container">
-        <span 
-          className="json-toggle" 
+        <span
+          className="json-toggle"
           onClick={() => setIsExpanded(!isExpanded)}
           onKeyDown={handleKeyDown}
           tabIndex={0}
@@ -222,12 +222,12 @@ const JsonViewer = ({ src, name = 'root', expanded = true, depth = 0 }) => {
             {keys.map(key => (
               <div key={key} className="json-item">
                 <span className="json-key">
-                  <span className="object-key">{key}</span>: 
+                  <span className="object-key">{key}</span>:
                 </span>
-                <JsonViewer 
-                  src={src[key]} 
-                  name={key} 
-                  expanded={depth < 2} 
+                <JsonViewer
+                  src={src[key]}
+                  name={key}
+                  expanded={depth < 2}
                   depth={depth + 1}
                 />
               </div>
@@ -241,7 +241,7 @@ const JsonViewer = ({ src, name = 'root', expanded = true, depth = 0 }) => {
   }
 
   return (
-    <span 
+    <span
       ref={elementRef}
       onContextMenu={handleContextMenu}
       title="右键复制"
@@ -251,4 +251,4 @@ const JsonViewer = ({ src, name = 'root', expanded = true, depth = 0 }) => {
   );
 };
 
-export default JsonViewer; 
+export default JsonViewer;

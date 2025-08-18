@@ -21,7 +21,7 @@ async function updateRedirectRules() {
     // 清除现有规则
     const existingRules = await chrome.declarativeNetRequest.getDynamicRules();
     const ruleIdsToRemove = existingRules.map(rule => rule.id);
-    
+
     if (ruleIdsToRemove.length > 0) {
       await chrome.declarativeNetRequest.updateDynamicRules({
         removeRuleIds: ruleIdsToRemove
@@ -45,20 +45,6 @@ async function updateRedirectRules() {
             resourceTypes: ["xmlhttprequest"]
           }
         },
-        {
-          id: 1002,
-          priority: 1,
-          action: {
-            type: "redirect",
-            redirect: {
-              regexSubstitution: currentApiUrlCache + "\\1"
-            }
-          },
-          condition: {
-            regexFilter: "^https?://lm\\.ok[^/]*(.*)",
-            resourceTypes: ["xmlhttprequest"]
-          }
-        }
       ];
 
       await chrome.declarativeNetRequest.updateDynamicRules({
@@ -81,7 +67,7 @@ chrome.webRequest.onCompleted.addListener(
     if (currentApiUrlCache && details.url.startsWith(currentApiUrlCache)) {
       // 获取原始URL（从重定向前推导）
       let originalUrl = details.url;
-      
+
       // 尝试推导原始URL
       if (details.url.startsWith(currentApiUrlCache)) {
         const pathPart = details.url.substring(currentApiUrlCache.length);
@@ -90,7 +76,7 @@ chrome.webRequest.onCompleted.addListener(
       }
 
       console.log('[Background] 检测到重定向请求完成:', originalUrl, '->', details.url);
-      
+
       // 通知content script
       chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         if (tabs[0]) {
@@ -120,7 +106,7 @@ chrome.webRequest.onCompleted.addListener(
 chrome.webRequest.onBeforeRequest.addListener(
   (details) => {
     const requestUrl = details.url;
-    const shouldProxy = /^https?:\/\/localhost/.test(requestUrl) || /^https?:\/\/lm\.ok/.test(requestUrl);
+    const shouldProxy = /^https?:\/\/localhost/.test(requestUrl);
     
     if (shouldProxy) {
       console.log('[Background] 检测到需要代理的请求:', details.url);
@@ -138,7 +124,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     sendResponse({ currentApiUrl: currentApiUrlCache || '未找到' });
     return true;
   }
-  
+
   if (message.type === 'UPDATE_API_URL') {
     currentApiUrlCache = message.apiUrl;
     chrome.storage.local.set({ currentApiUrl: message.apiUrl }, () => {
@@ -147,7 +133,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     });
     return true;
   }
-  
+
   return true;
 });
 
@@ -155,4 +141,4 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 chrome.runtime.onInstalled.addListener(() => {
   console.log('[Background] 插件已安装');
   updateRedirectRules();
-}); 
+});

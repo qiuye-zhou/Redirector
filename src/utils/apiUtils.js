@@ -4,8 +4,8 @@
 export const shouldEnableProxy = () => {
   const currentUrl = getCurrentUrl();
 
-  // 判断是否匹配 http://localhost 或 https://lm.ok
-  return /^https?:\/\/localhost/.test(currentUrl) || /^https?:\/\/lm\.ok/.test(currentUrl);
+  // 判断是否匹配 http://localhost
+  return /^https?:\/\/localhost/.test(currentUrl);
 };
 
 /**

@@ -1,8 +1,7 @@
 import React from 'react';
-// import './styles.css';
 
 const Other = ({ activeTab, onTabChange }) => {
-    
+
   const tabs = [
     { id: '遮挡层', icon: '🔗', label: 'API' },
     { id: '全局', icon: '🌐', label: '全局' },
@@ -26,4 +25,4 @@ const Other = ({ activeTab, onTabChange }) => {
   );
 };
 
-export default Other; 
+export default Other;

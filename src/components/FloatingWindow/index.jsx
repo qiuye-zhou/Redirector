@@ -22,7 +22,6 @@ const FloatingWindow = () => {
     const onMessage = (message) => {
       if (message.type === 'API_RESPONSE') {
         const { url, responseText } = message.data;
-        // console.log('[React] 收到 API 响应:', url, responseText);
         addRequest({ url, response: { url, responseText } }); // 更新 context 数据
       }
     };
@@ -142,12 +141,11 @@ const FloatingWindow = () => {
     <div>
       {
         // 检查当前页面是否需要显示代理功能
-        (/^https?:\/\/localhost/.test(window.location.href) || /^https?:\/\/lm\.ok/.test(window.location.href)) &&
+        /^https?:\/\/localhost/.test(window.location.href) &&
         <div>
           <button
             ref={floatingButtonRef}
             className="floating-button"
-            // onMouseDown={handleMouseDown}
             onClick={() => setIsVisible(!isVisible)}
           >
             🔍
