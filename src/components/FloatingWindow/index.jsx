@@ -8,8 +8,8 @@ const FloatingWindow = () => {
   const [activeTab, setActiveTab] = useState('API');
   const [isVisible, setIsVisible] = useState(false);
   const [position, setPosition] = useState({
-    x: window.innerWidth - 50,
-    y: window.innerHeight - 50,
+    x: window.innerWidth,
+    y: window.innerHeight,
   });
   const [isDragging, setIsDragging] = useState(false);
 
@@ -127,15 +127,6 @@ const FloatingWindow = () => {
       window.removeEventListener('mouseup', handleMouseUp);
     };
   }, [isDragging]);
-
-  // 更新按钮样式
-  useEffect(() => {
-    const buttonEl = floatingButtonRef.current;
-    if (!buttonEl) return;
-
-    buttonEl.style.left = `${position.x}px`;
-    buttonEl.style.top = `${position.y}px`;
-  }, [position]);
 
   return (
     <div>
