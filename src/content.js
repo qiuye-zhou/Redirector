@@ -1,6 +1,6 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import ContentApp from './ContentApp';
+import App from './App';
 // import './content.css';
 
 // 防止重复初始化
@@ -19,7 +19,7 @@ function initializeReactApp() {
   document.body.appendChild(container);
 
   const root = createRoot(container);
-  root.render(<ContentApp />);
+  root.render(<App />);
   
   isInitialized = true;
   console.log('[Content] React 应用已初始化');

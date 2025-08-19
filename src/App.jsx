@@ -1,12 +1,11 @@
-import ReactDOM from 'react-dom/client';
+import React from 'react';
 import { ApiConfigProvider } from './context/ApiConfigContext';
 import FloatingWindow from './components/FloatingWindow';
-import './App.css';
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-
-root.render(
+const App = () => (
   <ApiConfigProvider>
     <FloatingWindow />
   </ApiConfigProvider>
 );
+
+export default App;
