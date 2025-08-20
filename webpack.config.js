@@ -1,13 +1,15 @@
 const path = require('path');
 const CopyPlugin = require('copy-webpack-plugin');
 const UnoCSS = require('unocss/webpack').default;
+const webpack = require('webpack');
+const packageJson = require('./package.json');
 
 module.exports = {
   mode: 'production',
   entry: {
     content: './src/content.js',
     background: './src/background.js',
-    popup: './src/App.jsx' 
+    popup: './src/popup.jsx'
   },
   output: {
     filename: '[name].js',
@@ -22,13 +24,13 @@ module.exports = {
         use: {
           loader: 'babel-loader',
           options: {
-                          presets: [
-                ['@babel/preset-env', { 
-                  targets: { chrome: "58" },
-                  modules: false // 启用tree shaking
-                }],
-                '@babel/preset-react'
-              ],
+            presets: [
+              ['@babel/preset-env', { 
+                targets: { chrome: "58" },
+                modules: false
+              }],
+              '@babel/preset-react'
+            ],
             plugins: []
           }
         }
@@ -48,28 +50,18 @@ module.exports = {
   optimization: {
     minimize: true,
     usedExports: true,
-    sideEffects: false, // 启用tree shaking
+    sideEffects: false,
     splitChunks: {
       chunks: (chunk) => {
-        // 对content script禁用代码分割，对popup和background启用
         return chunk.name !== 'content';
       },
       cacheGroups: {
-        // React相关库打包到vendor chunk (仅用于popup)
         vendor: {
           test: /[\\/]node_modules[\\/](react|react-dom)[\\/]/,
           name: 'vendor',
           chunks: (chunk) => chunk.name === 'popup',
           priority: 10,
         },
-        // Antd库单独打包 (仅用于popup)
-        antd: {
-          test: /[\\/]node_modules[\\/]antd[\\/]/,
-          name: 'antd',
-          chunks: (chunk) => chunk.name === 'popup',
-          priority: 20,
-        },
-        // 其他第三方库
         common: {
           test: /[\\/]node_modules[\\/]/,
           name: 'common',
@@ -80,23 +72,23 @@ module.exports = {
       }
     }
   },
-  // 外部依赖优化 - 对于Chrome插件，我们不能使用CDN，所以注释掉
-  // externals: {
-  //   'react': 'React',
-  //   'react-dom': 'ReactDOM'
-  // },
   plugins: [
+    new webpack.DefinePlugin({
+      'process.env.VERSION': JSON.stringify(packageJson.version),
+      'process.env.PACKAGE_NAME': JSON.stringify(packageJson.name),
+      'process.env.DESCRIPTION': JSON.stringify(packageJson.description)
+    }),
     new CopyPlugin({
       patterns: [
-        { from: "public", to: "." },
+        { from: "src/popup.html", to: "popup.html" },
+        { from: "public", to: ".", globOptions: { ignore: ["**/popup.html", "**/popup.js"] } },
       ],
     }),
     UnoCSS(),
   ],
-  // 性能优化配置
   performance: {
-    maxAssetSize: 500000, // 500KB
-    maxEntrypointSize: 500000, // 500KB
+    maxAssetSize: 500000,
+    maxEntrypointSize: 500000,
     hints: 'warning'
   }
 };

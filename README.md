@@ -1,137 +1,110 @@
-# Redirect Wizard - 前端调试工具
+# Redirector - Chrome 浏览器插件
 
 一个专为前端开发者设计的Chrome浏览器插件，用于API请求重定向和调试，让前后端联调变得更加便捷高效。
 
-## 🚀 功能特性
-
-### ✅ 已实现功能
-- **API请求重定向**: 保存目标地址后，自动将所有请求重定向到指定服务器
-- **实时请求监控**: 实时显示当前页面的所有API请求信息
-- **请求详情查看**: 点击请求可查看详细的请求和响应数据
-- **多环境切换**: 支持保存多个API地址，快速切换不同环境
-- **JSON数据展示**: 美观的JSON数据查看器，方便调试
-
-### 🔄 待开发的功能
-- [ ] 多用户登录管理
-- [ ] 用户身份快速切换
-- [ ] 请求过滤和搜索
-- [ ] 请求历史记录
-- [ ] 自定义请求头管理
-
-## 📦 安装使用
-
-### 开发环境安装
-
-1. **克隆项目**
-   ```bash
-   git clone [项目地址]
-   cd chrome-plugin
-   ```
-
-2. **安装依赖**
-   ```bash
-   npm install
-   # 或使用 pnpm
-   pnpm install
-   ```
-
-3. **构建插件**
-   ```bash
-   npm run build
-   ```
-
-4. **加载到Chrome**
-   - 打开Chrome浏览器
-   - 访问 `chrome://extensions/`
-   - 开启"开发者模式"
-   - 点击"加载已解压的扩展程序"
-   - 选择项目的 `extensions` 目录
-
-### 使用方法
-
-1. **配置API地址**
-   - 点击浏览器工具栏中的插件图标
-   - 在"API配置"中输入目标服务器地址
-   - 点击"保存"按钮
-
-2. **启用重定向**
-   - 选择已保存的API地址作为当前环境
-   - 插件会自动拦截页面请求并重定向
-
-3. **查看请求信息**
-   - 在"请求列表"中查看所有拦截的请求
-   - 点击请求可查看详细的请求和响应数据
-
-## 🛠️ 技术栈
-
-- **前端框架**: React 18
-- **UI组件库**: Ant Design
-- **构建工具**: Webpack 5
-- **CSS框架**: UnoCSS
-- **浏览器API**: Chrome Extension Manifest V3
-- **开发语言**: JavaScript (ES6+)
-
-## 📁 项目结构
+## 项目结构
 
 ```
-chrome-plugin/
-├── public/                 # 构建输出目录
-├── src/                    # 源代码
-│   ├── components/         # React组件
-│   │   ├── ApiConfig/      # API配置组件
-│   │   ├── RequestList/    # 请求列表组件
-│   │   ├── JsonViewer/     # JSON查看器
-│   │   └── FloatingWindow/ # 浮动窗口
-│   ├── context/            # React Context
-│   ├── hooks/              # 自定义Hooks
-│   ├── services/           # 服务层
-│   ├── utils/              # 工具函数
-│   ├── background.js       # 后台脚本
-│   ├── content.js          # 内容脚本
-│   └── manifest.js         # 插件清单
-├── scripts/                # 构建脚本
-└── webpack.config.js       # Webpack配置
+Redirector/
+├── src/                          # 源代码目录
+│   ├── components/               # React 组件
+│   │   ├── ApiConfig/           # API 配置组件
+│   │   ├── FloatingWindow/      # 浮动窗口组件
+│   │   ├── JsonViewer/          # JSON 查看器组件
+│   │   ├── Popup/               # 弹窗组件 (新增)
+│   │   ├── RequestList/         # 请求列表组件
+│   │   └── Sidebar/             # 侧边栏组件
+│   ├── context/                 # React Context
+│   ├── hooks/                   # 自定义 Hooks
+│   ├── popup.jsx                # 弹窗入口文件 (新增)
+│   ├── popup.html               # 弹窗 HTML 模板 (新增)
+│   ├── content.js               # 内容脚本
+│   ├── background.js            # 后台脚本
+│   └── manifest.js              # 清单文件生成器
+├── public/                      # 静态资源
+│   ├── content.css              # 内容脚本样式
+│   └── images/                  # 图标资源
+├── scripts/                     # 构建脚本
+├── webpack.config.js            # Webpack 配置
+└── package.json                 # 项目配置
 ```
 
-## 🔧 开发指南
+## 主要功能
+
+- **API 请求重定向**: 将本地开发环境的 API 请求重定向到指定的服务器
+- **请求拦截和修改**: 拦截网络请求，支持修改请求头和请求体
+- **响应数据查看**: 实时查看 API 响应数据
+- **浮动配置窗口**: 在页面上显示可拖拽的配置窗口
+- **弹窗管理界面**: 通过浏览器插件弹窗管理配置
+
+## 开发指南
+
+### 安装依赖
+
+```bash
+npm install
+# 或者
+pnpm install
+```
 
 ### 开发模式
+
 ```bash
-# 监听文件变化并自动构建
-npm run watch
+npm run dev
 ```
 
 ### 构建生产版本
+
 ```bash
-# 构建生产版本
 npm run build
 ```
 
-### 主要组件说明
+### 清理构建文件
 
-- **ApiConfig**: 管理API地址配置，支持多环境切换
-- **RequestList**: 显示拦截的请求列表，支持详情查看
-- **JsonViewer**: 格式化显示JSON数据
-- **FloatingWindow**: 提供浮动窗口功能
+```bash
+npm run clean
+```
 
-## 🔒 权限说明
+## 技术栈
 
-插件需要以下权限：
-- `storage`: 存储配置信息
-- `webRequest`: 拦截网络请求
-- `declarativeNetRequest`: 声明式网络请求重定向
-- `tabs`: 访问标签页信息
-- `scripting`: 注入脚本
-- `<all_urls>`: 访问所有网站
+- **前端框架**: React 18
+- **构建工具**: Webpack 5
+- **样式方案**: UnoCSS
+- **浏览器 API**: Chrome Extension Manifest V3
+- **代码质量**: ESLint + Prettier
 
-## 📄 许可证
+## 组件说明
 
-本项目采用 MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情
+### Popup 组件
+- 位置: `src/components/Popup/`
+- 功能: 浏览器插件弹窗界面，显示插件状态和配置信息
+- 特性: 实时状态检查、Service Worker 监控、存储信息展示
 
-## 🆘 问题反馈
+### FloatingWindow 组件
+- 位置: `src/components/FloatingWindow/`
+- 功能: 页面上的浮动配置窗口，支持拖拽
+- 特性: 可拖拽、多标签页、响应式设计
 
-如果您在使用过程中遇到问题或有功能建议，请通过以下方式联系：
+### ApiConfig 组件
+- 位置: `src/components/ApiConfig/`
+- 功能: API 配置管理
+- 特性: 配置保存、规则管理、实时生效
 
-- 提交 [Issue](../../issues)
+## 构建配置
 
----
+项目使用 Webpack 5 进行构建，主要配置包括：
+
+- **多入口点**: content.js、background.js、popup.jsx
+- **代码分割**: 针对不同入口点优化打包策略
+- **资源复制**: 自动复制必要的静态资源
+- **样式处理**: 支持 CSS 和 UnoCSS
+
+## 浏览器兼容性
+
+- Chrome 58+
+- 支持 Manifest V3
+- 现代 ES6+ 语法
+
+## 许可证
+
+MIT License
