@@ -5,8 +5,6 @@ import './styles.css';
 const Popup = () => {
   const [status, setStatus] = useState('检查中...');
   const [statusColor, setStatusColor] = useState('#666');
-  const [swStatus, setSwStatus] = useState('检查中...');
-  const [swStatusColor, setSwStatusColor] = useState('#666');
   const [currentApiUrl, setCurrentApiUrl] = useState('');
   const [buildTime] = useState(new Date().toLocaleString());
 
@@ -16,27 +14,6 @@ const Popup = () => {
 
   const { addRequest } = useApiConfig();
 
-  // 检查 Service Worker 状态
-  const checkServiceWorker = async () => {
-    try {
-      const response = await chrome.runtime.sendMessage({
-        type: 'STATUS_CHECK',
-        time: new Date().toISOString()
-      });
-
-      if (response && response.status === 'alive') {
-        setSwStatus(`运行中 (#${response.heartbeatCount})`);
-        setSwStatusColor('#4caf50');
-      } else {
-        setSwStatus('未运行');
-        setSwStatusColor('#f44336');
-      }
-    } catch (error) {
-      setSwStatus('检查失败');
-      setSwStatusColor('#f44336');
-    }
-  };
-
   // 获取存储信息
   const getStorageInfo = async () => {
     try {
@@ -45,11 +22,11 @@ const Popup = () => {
       if (result.currentApiUrl) {
         setCurrentApiUrl(result.currentApiUrl);
         setStatus(`重定向地址: ${result.currentApiUrl}`);
-        setStatusColor('#4caf50');
+        setStatusColor('#81c784');
       } else {
         setCurrentApiUrl('');
         setStatus('未设置重定向地址');
-        setStatusColor('#f44336');
+        setStatusColor('#e57373');
       }
     } catch (error) {
       console.error('获取存储信息失败:', error);
@@ -58,11 +35,7 @@ const Popup = () => {
 
   useEffect(() => {
     // 初始化检查
-    checkServiceWorker();
     getStorageInfo();
-
-    // 定期检查 Service Worker 状态
-    const interval = setInterval(checkServiceWorker, 5000);
 
     return () => clearInterval(interval);
   }, []);
@@ -80,13 +53,6 @@ const Popup = () => {
             <label>状态:</label>
             <span className="status-text" style={{ color: statusColor }}>
               {status}
-            </span>
-          </div>
-
-          <div className="status-item">
-            <label>Service Worker:</label>
-            <span className="status-text" style={{ color: swStatusColor }}>
-              {swStatus}
             </span>
           </div>
         </div>
