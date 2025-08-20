@@ -81,7 +81,7 @@ module.exports = {
     new CopyPlugin({
       patterns: [
         { from: "src/popup.html", to: "popup.html" },
-        { from: "public", to: ".", globOptions: { ignore: ["**/popup.html", "**/popup.js"] } },
+        { from: "public", to: "."},
       ],
     }),
     UnoCSS(),

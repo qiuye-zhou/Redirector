@@ -7,7 +7,6 @@ const Popup = () => {
   const [statusColor, setStatusColor] = useState('#666');
   const [swStatus, setSwStatus] = useState('检查中...');
   const [swStatusColor, setSwStatusColor] = useState('#666');
-  const [requestCount, setRequestCount] = useState(0);
   const [currentApiUrl, setCurrentApiUrl] = useState('');
   const [buildTime] = useState(new Date().toLocaleString());
 
@@ -41,7 +40,7 @@ const Popup = () => {
   // 获取存储信息
   const getStorageInfo = async () => {
     try {
-      const result = await chrome.storage.local.get(['currentApiUrl', 'requestCount']);
+      const result = await chrome.storage.local.get(['currentApiUrl']);
       
       if (result.currentApiUrl) {
         setCurrentApiUrl(result.currentApiUrl);
@@ -52,8 +51,6 @@ const Popup = () => {
         setStatus('未设置重定向地址');
         setStatusColor('#f44336');
       }
-
-      setRequestCount(result.requestCount || 0);
     } catch (error) {
       console.error('获取存储信息失败:', error);
     }
@@ -100,11 +97,6 @@ const Popup = () => {
             <span className="info-value">
               {currentApiUrl || '未设置'}
             </span>
-          </div>
-
-          <div className="info-item">
-            <label>请求次数:</label>
-            <span className="info-value">{requestCount}</span>
           </div>
         </div>
 
