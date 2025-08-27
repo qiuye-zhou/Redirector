@@ -51,7 +51,13 @@ const ApiConfig = () => {
       <div className='font-bold'>Doc</div>
       <div className='flex gap-10'>
         {savedApis.map(api => (
-          <div className={api === currentApiUrl ? 'c-#0958d9!' : ''} onClick={() => { setCurrentApi(api) }}>{api}</div>
+          <div
+            className='cursor-pointer'
+            onClick={() => window.open(`${api}/swagger-ui/index.html`, '_blank')}
+            title="点击打开 Swagger UI 文档"
+          >
+            {api}/swagger-ui/index.html
+          </div>
         ))}
       </div>
 
