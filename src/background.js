@@ -26,13 +26,20 @@ async function updateRedirectRules() {
       await chrome.declarativeNetRequest.updateDynamicRules({
         removeRuleIds: ruleIdsToRemove
       });
+      
+      // 等待规则清除完成
+      await new Promise(resolve => setTimeout(resolve, 100));
     }
 
     // 如果有API URL，添加新规则
     if (currentApiUrlCache) {
+      // 生成唯一的规则ID，避免冲突
+      const timestamp = Date.now();
+      const uniqueId = timestamp % 10000; // 使用时间戳生成唯一ID
+      
       const rules = [
         {
-          id: 1001,
+          id: uniqueId,
           priority: 1,
           action: {
             type: "redirect",
@@ -51,7 +58,7 @@ async function updateRedirectRules() {
         addRules: rules
       });
 
-      console.log('[Background] 重定向规则已更新:', currentApiUrlCache);
+      console.log('[Background] 重定向规则已更新:', currentApiUrlCache, '规则ID:', uniqueId);
     } else {
       console.log('[Background] API URL未设置，清除重定向规则');
     }
