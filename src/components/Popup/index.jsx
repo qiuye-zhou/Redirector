@@ -7,7 +7,6 @@ const Popup = () => {
   const [status, setStatus] = useState('检查中...');
   const [statusColor, setStatusColor] = useState('#666');
   const [currentApiUrl, setCurrentApiUrl] = useState('');
-  const [buildTime] = useState(new Date().toLocaleString());
   const [newPattern, setNewPattern] = useState('');
   const [editingPattern, setEditingPattern] = useState(null);
   const [editValue, setEditValue] = useState('');
@@ -15,6 +14,7 @@ const Popup = () => {
   // 从 webpack 注入的环境变量获取版本信息
   const version = process.env.VERSION || '0.1.0';
   const packageName = process.env.PACKAGE_NAME || 'redirector';
+  const buildTime = process.env.BUILD_TIME || new Date().toLocaleString();
 
   const { addRequest } = useApiConfig();
   const { shouldShowProxy, addShouldShowProxy, removeShouldShowProxy } = useShouldShowProxy();

@@ -76,7 +76,8 @@ module.exports = {
     new webpack.DefinePlugin({
       'process.env.VERSION': JSON.stringify(packageJson.version),
       'process.env.PACKAGE_NAME': JSON.stringify(packageJson.name),
-      'process.env.DESCRIPTION': JSON.stringify(packageJson.description)
+      'process.env.DESCRIPTION': JSON.stringify(packageJson.description),
+      'process.env.BUILD_TIME': JSON.stringify(new Date().toLocaleString())
     }),
     new CopyPlugin({
       patterns: [
