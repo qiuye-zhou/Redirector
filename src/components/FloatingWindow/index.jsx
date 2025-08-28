@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Sidebar from '../Sidebar';
 import RequestList from '../RequestList';
 import ApiConfig from '../ApiConfig';
@@ -8,12 +8,6 @@ import { useApiConfig } from '../../context/ApiConfigContext';
 const FloatingWindow = () => {
   const [activeTab, setActiveTab] = useState('API');
   const [isVisible, setIsVisible] = useState(false);
-  const [position, setPosition] = useState({
-    x: window.innerWidth - 60,
-    y: window.innerHeight - 60,
-  });
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
 
   const floatingButtonRef = useRef(null);
   const { addRequest } = useApiConfig();
@@ -30,56 +24,6 @@ const FloatingWindow = () => {
     chrome.runtime.onMessage.addListener(onMessage);
     return () => chrome.runtime.onMessage.removeListener(onMessage);
   }, [addRequest]);
-
-  // 拖拽处理
-  const handleMouseDown = useCallback((e) => {
-    if (!floatingButtonRef.current) return;
-    
-    const rect = floatingButtonRef.current.getBoundingClientRect();
-    const offsetX = e.clientX - rect.left;
-    const offsetY = e.clientY - rect.top;
-    
-    setDragOffset({ x: offsetX, y: offsetY });
-    setIsDragging(true);
-  }, []);
-
-  const handleMouseMove = useCallback((e) => {
-    if (!isDragging || !floatingButtonRef.current) return;
-
-    const padding = 20;
-    const viewportWidth = window.innerWidth;
-    const viewportHeight = window.innerHeight;
-    const buttonEl = floatingButtonRef.current;
-    const rect = buttonEl.getBoundingClientRect();
-
-    let newX = e.clientX - dragOffset.x;
-    let newY = e.clientY - dragOffset.y;
-
-    // 边界限制
-    newX = Math.max(padding, Math.min(newX, viewportWidth - rect.width - padding));
-    newY = Math.max(padding, Math.min(newY, viewportHeight - rect.height - padding));
-
-    setPosition({ x: newX, y: newY });
-    buttonEl.style.left = `${newX}px`;
-    buttonEl.style.top = `${newY}px`;
-  }, [isDragging, dragOffset]);
-
-  const handleMouseUp = useCallback(() => {
-    setIsDragging(false);
-  }, []);
-
-  // 事件监听器
-  useEffect(() => {
-    if (isDragging) {
-      window.addEventListener('mousemove', handleMouseMove);
-      window.addEventListener('mouseup', handleMouseUp);
-      
-      return () => {
-        window.removeEventListener('mousemove', handleMouseMove);
-        window.removeEventListener('mouseup', handleMouseUp);
-      };
-    }
-  }, [isDragging, handleMouseMove, handleMouseUp]);
 
   const renderContent = () => {
     switch (activeTab) {
@@ -106,7 +50,6 @@ const FloatingWindow = () => {
       <button
         ref={floatingButtonRef}
         className="floating-button"
-        onMouseDown={handleMouseDown}
         onClick={() => setIsVisible(!isVisible)}
       >
         🔧

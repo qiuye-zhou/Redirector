@@ -4,7 +4,7 @@
   position: absolute !important;
   right: 0px !important;
   bottom: 0px !important;
-  background-color: #818181 !important;
+  background-color: #008cff !important;
   border-radius: 20% !important;
   display: flex !important;
   align-items: center !important;
@@ -17,5 +17,5 @@
 }
 
 .floating-button:hover {
-  background-image: radial-gradient(circle at center, #e0f7fa, transparent);
+  background-image: radial-gradient(circle at center, #7cc3fd, transparent);
 }
