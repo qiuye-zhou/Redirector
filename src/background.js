@@ -1,6 +1,9 @@
 // 存储当前API URL的缓存
 let currentApiUrlCache = null;
 
+// 全局规则ID计数器，确保唯一性
+let ruleIdCounter = 1;
+
 // 初始化时读取API URL
 chrome.storage.local.get('currentApiUrl', (result) => {
   currentApiUrlCache = result.currentApiUrl || null;
@@ -11,6 +14,12 @@ chrome.storage.local.get('currentApiUrl', (result) => {
 chrome.storage.onChanged.addListener((changes) => {
   if (changes.currentApiUrl) {
     currentApiUrlCache = changes.currentApiUrl.newValue || null;
+    updateRedirectRules();
+  }
+
+  // 监听代理配置变化，更新重定向规则
+  if (changes.shouldShowProxy) {
+    console.log('[Background] 代理配置已更新，重新生成重定向规则');
     updateRedirectRules();
   }
 });
@@ -26,39 +35,57 @@ async function updateRedirectRules() {
       await chrome.declarativeNetRequest.updateDynamicRules({
         removeRuleIds: ruleIdsToRemove
       });
-      
+
       // 等待规则清除完成
       await new Promise(resolve => setTimeout(resolve, 100));
     }
 
     // 如果有API URL，添加新规则
     if (currentApiUrlCache) {
-      // 生成唯一的规则ID，避免冲突
-      const timestamp = Date.now();
-      const uniqueId = timestamp % 10000; // 使用时间戳生成唯一ID
-      
-      const rules = [
-        {
-          id: uniqueId,
-          priority: 1,
-          action: {
-            type: "redirect",
-            redirect: {
-              regexSubstitution: currentApiUrlCache + "\\1"
+      // 获取代理配置
+      const result = await chrome.storage.local.get(['shouldShowProxy']);
+      const patterns = result.shouldShowProxy || ['^https?://localhost', '^https?://127\\.0\\.0\\.1'];
+
+      const rules = [];
+
+      // 为每个模式创建重定向规则
+      for (let i = 0; i < patterns.length; i++) {
+        const pattern = patterns[i];
+        try {
+          // 将模式转换为适合 declarativeNetRequest 的格式
+          const regexFilter = pattern.replace(/^\^/, '').replace(/\$$/, '') + '([^/]*(.*))';
+
+          // 使用全局计数器生成唯一ID
+          const uniqueId = ruleIdCounter++;
+
+          rules.push({
+            id: uniqueId,
+            priority: 1,
+            action: {
+              type: "redirect",
+              redirect: {
+                regexSubstitution: currentApiUrlCache + "\\2"
+              }
+            },
+            condition: {
+              regexFilter: regexFilter,
+              resourceTypes: ["xmlhttprequest"]
             }
-          },
-          condition: {
-            regexFilter: "^https?://localhost[^/]*(.*)",
-            resourceTypes: ["xmlhttprequest"]
-          }
-        },
-      ];
+          });
+        } catch (error) {
+          console.warn('[Background] 跳过无效的正则表达式模式:', pattern, error);
+        }
+      }
 
-      await chrome.declarativeNetRequest.updateDynamicRules({
-        addRules: rules
-      });
+      if (rules.length > 0) {
+        await chrome.declarativeNetRequest.updateDynamicRules({
+          addRules: rules
+        });
 
-      console.log('[Background] 重定向规则已更新:', currentApiUrlCache, '规则ID:', uniqueId);
+        console.log('[Background] 重定向规则已更新:', currentApiUrlCache, '规则数量:', rules.length);
+      } else {
+        console.log('[Background] 没有有效的代理模式，无法创建重定向规则');
+      }
     } else {
       console.log('[Background] API URL未设置，清除重定向规则');
     }
@@ -89,8 +116,8 @@ chrome.webRequest.onCompleted.addListener(
         if (tabs[0]) {
           chrome.tabs.sendMessage(tabs[0].id, {
             type: 'API_RESPONSE',
-            data: { 
-              url: originalUrl, 
+            data: {
+              url: originalUrl,
               redirectedUrl: details.url,
               responseText: { message: '请求已重定向', url: details.url }
             }
@@ -111,12 +138,28 @@ chrome.webRequest.onCompleted.addListener(
 
 // 监听请求开始事件，用于调试
 chrome.webRequest.onBeforeRequest.addListener(
-  (details) => {
+  async (details) => {
     const requestUrl = details.url;
-    const shouldProxy = /^https?:\/\/localhost/.test(requestUrl);
-    
-    if (shouldProxy) {
-      console.log('[Background] 检测到需要代理的请求:', details.url);
+
+    try {
+      const result = await chrome.storage.local.get(['shouldShowProxy']);
+      const patterns = result.shouldShowProxy || ['^https?://localhost', '^https?://127\\.0\\.0\\.1'];
+
+      const shouldProxy = patterns.some(pattern => {
+        try {
+          const regex = new RegExp(pattern);
+          return regex.test(requestUrl);
+        } catch (error) {
+          console.warn('[Background] 无效的正则表达式模式:', pattern);
+          return false;
+        }
+      });
+
+      if (shouldProxy) {
+        console.log('[Background] 检测到需要代理的请求:', details.url);
+      }
+    } catch (error) {
+      console.error('[Background] 检查代理配置失败:', error);
     }
   },
   {
