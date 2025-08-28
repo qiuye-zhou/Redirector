@@ -4,6 +4,7 @@ import RequestList from '../RequestList';
 import ApiConfig from '../ApiConfig';
 import './styles.css';
 import { useApiConfig } from '../../context/ApiConfigContext';
+import { useShouldShowProxy } from '../../hooks/useShouldShowProxy';
 
 const FloatingWindow = () => {
   const [activeTab, setActiveTab] = useState('API');
@@ -11,6 +12,7 @@ const FloatingWindow = () => {
 
   const floatingButtonRef = useRef(null);
   const { addRequest } = useApiConfig();
+  const { shouldShowProxy } = useShouldShowProxy();
 
   // 监听来自 background 的消息
   useEffect(() => {
@@ -40,10 +42,18 @@ const FloatingWindow = () => {
     }
   };
 
-  // 检查是否显示代理功能
-  const shouldShowProxy = /^https?:\/\/localhost/.test(window.location.href);
+  // 检查是否显示代理功能 - 使用从 hook 获取的状态
+  const isShouldShowProxy = shouldShowProxy.some(pattern => {
+    try {
+      const regex = new RegExp(pattern);
+      return regex.test(window.location.href);
+    } catch (error) {
+      console.warn('Invalid regex pattern:', pattern);
+      return false;
+    }
+  });
 
-  if (!shouldShowProxy) return null;
+  if (!isShouldShowProxy) return null;
 
   return (
     <>
