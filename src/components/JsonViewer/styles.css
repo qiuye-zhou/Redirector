@@ -58,6 +58,7 @@
     max-height: 0;
     transform: translateY(-5px);
   }
+
   to {
     opacity: 1;
     max-height: 1000px;
@@ -264,8 +265,13 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 0.6; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 0.6;
+  }
 }
 
 /* 复制成功提示弹窗 */
@@ -288,14 +294,17 @@
     opacity: 0;
     transform: translateY(10px);
   }
+
   20% {
     opacity: 1;
     transform: translateY(0);
   }
+
   80% {
     opacity: 1;
     transform: translateY(0);
   }
+
   100% {
     opacity: 0;
     transform: translateY(-10px);
@@ -362,67 +371,67 @@
     color: #e2e8f0;
     background: #1a202c;
   }
-  
+
   .json-toggle {
     color: #a0aec0;
   }
-  
+
   .json-toggle:hover {
     background-color: #2d3748;
     color: #e2e8f0;
   }
-  
+
   .json-toggle:focus {
     background-color: #2b6cb0;
     box-shadow: 0 0 0 2px #63b3ed;
   }
-  
+
   .json-content {
     border-left-color: #4a5568;
   }
-  
+
   .json-item:hover {
     background-color: #2d3748;
   }
-  
+
   .json-key {
     color: #b794f6;
   }
-  
+
   .json-string {
     color: #68d391;
   }
-  
+
   .json-string:hover {
     background-color: rgba(104, 211, 145, 0.1);
   }
-  
+
   .json-number {
     color: #63b3ed;
   }
-  
+
   .json-number:hover {
     background-color: rgba(99, 179, 237, 0.1);
   }
-  
+
   .json-boolean {
     color: #fc8181;
   }
-  
+
   .json-boolean:hover {
     background-color: rgba(252, 129, 129, 0.1);
   }
-  
+
   .json-viewer-root {
     background: #1a202c;
     border-color: #4a5568;
   }
-  
+
   .json-viewer-root::before {
     background: linear-gradient(90deg, #2b6cb0, #3182ce);
   }
-  
+
   .copy-tooltip {
     background: #48bb78;
   }
-} 
+}

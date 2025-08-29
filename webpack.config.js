@@ -25,7 +25,7 @@ module.exports = {
           loader: 'babel-loader',
           options: {
             presets: [
-              ['@babel/preset-env', { 
+              ['@babel/preset-env', {
                 targets: { chrome: "58" },
                 modules: false
               }],
@@ -82,7 +82,7 @@ module.exports = {
     new CopyPlugin({
       patterns: [
         { from: "src/popup.html", to: "popup.html" },
-        { from: "public", to: "."},
+        { from: "public", to: "." },
       ],
     }),
     UnoCSS(),

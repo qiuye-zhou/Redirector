@@ -40,10 +40,21 @@
   font-weight: bold;
 }
 
-.request-item .method.get { color: #61affe; }
-.request-item .method.post { color: #49cc90; }
-.request-item .method.put { color: #fca130; }
-.request-item .method.delete { color: #f93e3e; }
+.request-item .method.get {
+  color: #61affe;
+}
+
+.request-item .method.post {
+  color: #49cc90;
+}
+
+.request-item .method.put {
+  color: #fca130;
+}
+
+.request-item .method.delete {
+  color: #f93e3e;
+}
 
 .request-item .url {
   flex: 1;
@@ -61,4 +72,4 @@
   padding: 20px;
   text-align: center;
   color: #999;
-} 
+}

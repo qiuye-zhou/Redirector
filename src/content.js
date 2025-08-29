@@ -9,18 +9,18 @@ let isInitialized = false;
 // 初始化 React 组件
 function initializeReactApp() {
   if (isInitialized) return;
-  
+
   // 检查是否已经存在容器
   let container = document.getElementById('g-plugin-root');
   if (container) return;
-  
+
   container = document.createElement('div');
   container.id = 'g-plugin-root';
   document.body.appendChild(container);
 
   const root = createRoot(container);
   root.render(<App />);
-  
+
   isInitialized = true;
   console.log('[Content] React 应用已初始化');
 }
@@ -29,10 +29,10 @@ function initializeReactApp() {
 function initialize() {
   // 如果已经初始化过，直接返回
   if (isInitialized) return;
-  
+
   // 初始化 React 应用
   initializeReactApp();
-  
+
   // 获取 API URL
   chrome.runtime.sendMessage({ type: "GET_CURRENT_API_URL" }, (response) => {
     if (chrome.runtime.lastError) {
@@ -60,13 +60,13 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       detail: message.data
     }));
   }
-  
+
   if (message.type === 'NEW_REQUEST' || message.type === 'REQUEST_COMPLETED') {
     // 发送消息到 React 组件
     window.dispatchEvent(new CustomEvent('g-plugin-request', {
       detail: message.data
     }));
   }
-  
+
   return true;
-}); 
+});

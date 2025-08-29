@@ -42,9 +42,9 @@ export const useApiConfig = () => {
     chrome.storage.local.set({ currentApiUrl: url }, () => {
       setCurrentApiUrl(url);
       // 通知background script更新重定向规则
-      chrome.runtime.sendMessage({ 
-        type: 'UPDATE_API_URL', 
-        apiUrl: url 
+      chrome.runtime.sendMessage({
+        type: 'UPDATE_API_URL',
+        apiUrl: url
       }, (response) => {
         if (chrome.runtime.lastError) {
           console.warn('通知background script失败:', chrome.runtime.lastError.message);

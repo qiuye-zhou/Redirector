@@ -6,7 +6,9 @@
   "scripts": {
     "build": "webpack --mode production && esno scripts/prepare.js",
     "build:prepare": "esno scripts/prepare.js",
-    "watch": "webpack --mode production --watch"
+    "watch": "webpack --mode production --watch",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "dependencies": {
     "react": "^18.2.0",
@@ -27,6 +29,9 @@
     "copy-webpack-plugin": "^13.0.0",
     "core-js": "^3.44.0",
     "css-loader": "^6.11.0",
+    "eslint": "^9.34.0",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^5.2.0",
     "esno": "^4.8.0",
     "fs-extra": "^11.3.0",
     "kolorist": "^1.8.0",

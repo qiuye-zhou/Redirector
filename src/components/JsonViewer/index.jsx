@@ -193,7 +193,7 @@ const JsonViewer = ({ src, name = 'root', expanded = true, depth = 0 }) => {
         onContextMenu={handleContextMenu}
         title="空对象 - 右键复制"
       >
-        <span className="type-icon">{}</span>{}
+        <span className="type-icon">{ }</span>{ }
       </span>
     );
 
@@ -212,7 +212,7 @@ const JsonViewer = ({ src, name = 'root', expanded = true, depth = 0 }) => {
           title={`对象 (${keys.length} 属性) - 点击展开/折叠, 右键复制`}
         >
           <span className="expand-icon">{isExpanded ? '▼' : '▶'}</span>
-          <span className="type-icon">{}</span>
+          <span className="type-icon">{ }</span>
           <span className="object-name">{name}</span>
           <span className="item-count">({keys.length})</span>
           <span className="copy-hint-toggle">📋</span>
