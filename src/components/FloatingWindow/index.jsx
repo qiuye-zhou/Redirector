@@ -33,10 +33,8 @@ const FloatingWindow = () => {
         return <ApiConfig />;
       case '全局':
         return <RequestList />;
-      case '用户':
-        return <div>用户配置页面</div>;
       case '设置':
-        return <div>设置页面</div>;
+        return <div>其他功能待完善~</div>;
       default:
         return null;
     }

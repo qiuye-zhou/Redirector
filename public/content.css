@@ -15,49 +15,6 @@
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
-
-.floating-window {
-  position: absolute !important;
-  bottom: 42px !important;
-  right: 0 !important;
-  width: 800px !important;
-  background: white !important;
-  border-radius: 8px !important;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1) !important;
-  border: 1px solid #eee !important;
-  z-index: 999999 !important;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
-}
-
-.window-header {
-  padding: 12px 16px !important;
-  border-bottom: 1px solid #eee !important;
-  display: flex !important;
-  justify-content: space-between !important;
-  align-items: center !important;
-  background: #fff !important;
-}
-
-.window-header h3 {
-  margin: 0 !important;
-  font-size: 16px !important;
-  color: #333 !important;
-}
-
-.close-button {
-  border: none !important;
-  background: none !important;
-  font-size: 20px !important;
-  cursor: pointer !important;
-  color: #666 !important;
-  padding: 4px !important;
-}
-
-.window-body {
-  display: flex !important;
-  height: 400px !important;
-}
-
 .sidebar {
   width: 60px !important;
   border-right: 1px solid #eee !important;
@@ -85,12 +42,6 @@
 .sidebar-item.active {
   color: #2196F3 !important;
   background: #e3f2fd !important;
-}
-
-.main-content {
-  flex: 1 !important;
-  padding: 16px !important;
-  overflow-y: auto !important;
 }
 
 .input-group {
@@ -148,5 +99,3 @@
   color: white !important;
   border-color: #1976D2 !important;
 }
-
-/* ... 其他样式保持不变，但都添加 !important ... */ 

@@ -4,7 +4,6 @@ const Sidebar = ({ activeTab, onTabChange }) => {
   const tabs = [
     { id: 'API', icon: '🔗', label: 'API' },
     { id: '全局', icon: '🌐', label: '全局' },
-    { id: '用户', icon: '👤', label: '用户' },
     { id: '设置', icon: '⚙️', label: '设置' }
   ];
 
@@ -24,4 +23,4 @@ const Sidebar = ({ activeTab, onTabChange }) => {
   );
 };
 
-export default Sidebar; 
+export default Sidebar;
