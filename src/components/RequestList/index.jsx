@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import JsonViewer from '../JsonViewer';
 import { useApiConfig } from '../../context/ApiConfigContext';
 import './styles.css';
@@ -9,8 +9,6 @@ const RequestList = () => {
   const [isShow, setShow] = useState(false);
   const [curRequest, setCurRequest] = useState({});
 
-  console.log(requests)
-
   return (
     <div className="request-list pos-relative">
       <div className="request-list-body">
@@ -18,10 +16,9 @@ const RequestList = () => {
           <div className="empty-message">暂无请求</div>
         ) : (
           <div className='ml-10'>
-
             {
-              requests.map(request => (
-                <div onClick={() => {
+              requests.map((request, index) => (
+                <div key={index} onClick={() => {
                   setShow(true)
                   setCurRequest(request.response)
                 }} className='p-5 cp'>

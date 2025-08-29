@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { useApiConfig } from '../../hooks/useApiConfig';
+import React, { useState } from 'react';
+import { useApiConfig } from '../../context/ApiConfigContext';
 import Button from 'antd/es/button';
 import Input from 'antd/es/input';
 import 'antd/es/button/style';
 import 'antd/es/input/style';
 import './styles.css';
+
 const ApiConfig = () => {
   const {
     currentApiUrl,

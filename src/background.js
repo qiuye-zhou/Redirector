@@ -109,19 +109,19 @@ chrome.webRequest.onCompleted.addListener(
         originalUrl = 'http://localhost' + pathPart;
       }
 
-      console.log('[Background] 检测到重定向请求完成:', originalUrl, '->', details.url);
-
       // 通知content script
       chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         if (tabs[0]) {
-          chrome.tabs.sendMessage(tabs[0].id, {
+          const message = {
             type: 'API_RESPONSE',
             data: {
               url: originalUrl,
               redirectedUrl: details.url,
               responseText: { message: '请求已重定向', url: details.url }
             }
-          }, (response) => {
+          };
+
+          chrome.tabs.sendMessage(tabs[0].id, message, (response) => {
             if (chrome.runtime.lastError) {
               console.warn('[Background] 消息发送失败:', chrome.runtime.lastError.message);
             }
@@ -156,7 +156,7 @@ chrome.webRequest.onBeforeRequest.addListener(
       });
 
       if (shouldProxy) {
-        console.log('[Background] 检测到需要代理的请求:', details.url);
+        // 静默处理，不输出日志
       }
     } catch (error) {
       console.error('[Background] 检查代理配置失败:', error);
