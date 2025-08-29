@@ -50,7 +50,7 @@ const ApiConfig = () => {
       </div>
 
       <div className='font-bold'>Doc</div>
-      <div className='flex gap-10'>
+      <div className='flex flex-wrap gap-10'>
         {savedApis.map(api => (
           <div
             className='cursor-pointer'
