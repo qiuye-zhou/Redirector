@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
-import JsonViewer from '../JsonViewer';
-import { useApiConfig } from '../../context/ApiConfigContext';
-import './styles.css';
+import React, { useState } from 'react'
+import JsonViewer from '../JsonViewer'
+import { useApiConfig } from '../../context/ApiConfigContext'
+import './styles.css'
 
 const RequestList = () => {
-  const { requests } = useApiConfig();
+  const { requests } = useApiConfig()
 
-  const [isShow, setShow] = useState(false);
-  const [curRequest, setCurRequest] = useState({});
+  const [isShow, setShow] = useState(false)
+  const [curRequest, setCurRequest] = useState({})
 
   return (
     <div className="request-list pos-relative">
@@ -41,7 +41,7 @@ const RequestList = () => {
         )
       }
     </div>
-  );
-};
+  )
+}
 
-export default RequestList;
+export default RequestList

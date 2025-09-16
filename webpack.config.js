@@ -1,8 +1,8 @@
-const path = require('path');
-const CopyPlugin = require('copy-webpack-plugin');
-const UnoCSS = require('unocss/webpack').default;
-const webpack = require('webpack');
-const packageJson = require('./package.json');
+const path = require('path')
+const CopyPlugin = require('copy-webpack-plugin')
+const UnoCSS = require('unocss/webpack').default
+const webpack = require('webpack')
+const packageJson = require('./package.json')
 
 module.exports = {
   mode: 'production',
@@ -53,7 +53,7 @@ module.exports = {
     sideEffects: false,
     splitChunks: {
       chunks: (chunk) => {
-        return chunk.name !== 'content';
+        return chunk.name !== 'content'
       },
       cacheGroups: {
         vendor: {
@@ -92,4 +92,4 @@ module.exports = {
     maxEntrypointSize: 500000,
     hints: 'warning'
   }
-};
+}

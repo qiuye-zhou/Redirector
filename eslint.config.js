@@ -74,7 +74,8 @@ module.exports = [
     },
     rules: {
       'no-undef': 'warn',
-      'react/react-in-jsx-scope': 'off' // React 17+ 不需要显式导入 React
+      'react/react-in-jsx-scope': 'off', // React 17+ 不需要显式导入 React
+      'semi': ['error', 'never'] // 禁止语句末尾使用分号
     }
   }
-];
+]

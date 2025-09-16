@@ -1,64 +1,64 @@
-import React, { useState, useRef, useCallback } from 'react';
-import './styles.css';
+import React, { useState, useRef, useCallback } from 'react'
+import './styles.css'
 
 const JsonViewer = ({ src, name = 'root', expanded = true, depth = 0 }) => {
-  const [isExpanded, setIsExpanded] = useState(expanded);
-  const [isHovered, setIsHovered] = useState(false);
-  const elementRef = useRef(null);
+  const [isExpanded, setIsExpanded] = useState(expanded)
+  const [isHovered, setIsHovered] = useState(false)
+  const elementRef = useRef(null)
 
   // 如果是根元素，添加根容器样式
-  const isRoot = depth === 0;
+  const isRoot = depth === 0
 
   // 复制到剪贴板功能
   const copyToClipboard = useCallback((value) => {
-    const textToCopy = typeof value === 'string' ? value : JSON.stringify(value, null, 2);
+    const textToCopy = typeof value === 'string' ? value : JSON.stringify(value, null, 2)
     navigator.clipboard.writeText(textToCopy).then(() => {
       // 显示复制成功提示
-      const tooltip = document.createElement('div');
-      tooltip.className = 'copy-tooltip';
-      tooltip.textContent = '已复制!';
-      document.body.appendChild(tooltip);
+      const tooltip = document.createElement('div')
+      tooltip.className = 'copy-tooltip'
+      tooltip.textContent = '已复制!'
+      document.body.appendChild(tooltip)
 
-      const rect = elementRef.current?.getBoundingClientRect();
+      const rect = elementRef.current?.getBoundingClientRect()
       if (rect) {
-        tooltip.style.left = `${rect.left}px`;
-        tooltip.style.top = `${rect.top - 30}px`;
+        tooltip.style.left = `${rect.left}px`
+        tooltip.style.top = `${rect.top - 30}px`
       }
 
       setTimeout(() => {
-        document.body.removeChild(tooltip);
-      }, 1000);
-    });
-  }, []);
+        document.body.removeChild(tooltip)
+      }, 1000)
+    })
+  }, [])
 
   // 右键菜单处理
   const handleContextMenu = useCallback((e) => {
-    e.preventDefault();
-    copyToClipboard(src);
-  }, [src, copyToClipboard]);
+    e.preventDefault()
+    copyToClipboard(src)
+  }, [src, copyToClipboard])
 
   // 键盘事件处理
   const handleKeyDown = useCallback((e) => {
     if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      setIsExpanded(!isExpanded);
+      e.preventDefault()
+      setIsExpanded(!isExpanded)
     } else if (e.key === 'c' && (e.ctrlKey || e.metaKey)) {
-      e.preventDefault();
-      copyToClipboard(src);
+      e.preventDefault()
+      copyToClipboard(src)
     }
-  }, [isExpanded, src, copyToClipboard]);
+  }, [isExpanded, src, copyToClipboard])
 
   // 获取数据类型图标
   const getTypeIcon = (value) => {
-    if (value === null) return '∅';
-    if (value === undefined) return '?';
-    if (typeof value === 'string') return '"';
-    if (typeof value === 'number') return '#';
-    if (typeof value === 'boolean') return value ? '✓' : '✗';
-    if (Array.isArray(value)) return '[]';
-    if (typeof value === 'object') return '{}';
-    return '•';
-  };
+    if (value === null) return '∅'
+    if (value === undefined) return '?'
+    if (typeof value === 'string') return '"'
+    if (typeof value === 'number') return '#'
+    if (typeof value === 'boolean') return value ? '✓' : '✗'
+    if (Array.isArray(value)) return '[]'
+    if (typeof value === 'object') return '{}'
+    return '•'
+  }
 
   if (src === null) return (
     <span
@@ -69,7 +69,7 @@ const JsonViewer = ({ src, name = 'root', expanded = true, depth = 0 }) => {
     >
       <span className="type-icon">∅</span> null
     </span>
-  );
+  )
 
   if (src === undefined) return (
     <span
@@ -80,7 +80,7 @@ const JsonViewer = ({ src, name = 'root', expanded = true, depth = 0 }) => {
     >
       <span className="type-icon">?</span> undefined
     </span>
-  );
+  )
 
   if (typeof src === 'string') {
     return (
@@ -95,7 +95,7 @@ const JsonViewer = ({ src, name = 'root', expanded = true, depth = 0 }) => {
         <span className="type-icon">"</span>"{src}"
         {isHovered && <span className="copy-hint">📋</span>}
       </span>
-    );
+    )
   }
 
   if (typeof src === 'number') {
@@ -111,7 +111,7 @@ const JsonViewer = ({ src, name = 'root', expanded = true, depth = 0 }) => {
         <span className="type-icon">#</span>{src}
         {isHovered && <span className="copy-hint">📋</span>}
       </span>
-    );
+    )
   }
 
   if (typeof src === 'boolean') {
@@ -127,7 +127,7 @@ const JsonViewer = ({ src, name = 'root', expanded = true, depth = 0 }) => {
         <span className="type-icon">{src ? '✓' : '✗'}</span>{src.toString()}
         {isHovered && <span className="copy-hint">📋</span>}
       </span>
-    );
+    )
   }
 
   if (Array.isArray(src)) {
@@ -140,7 +140,7 @@ const JsonViewer = ({ src, name = 'root', expanded = true, depth = 0 }) => {
       >
         <span className="type-icon">[]</span>[]
       </span>
-    );
+    )
 
     const content = (
       <div className="json-container">
@@ -179,13 +179,13 @@ const JsonViewer = ({ src, name = 'root', expanded = true, depth = 0 }) => {
           </div>
         )}
       </div>
-    );
+    )
 
-    return isRoot ? <div className="json-viewer-root">{content}</div> : content;
+    return isRoot ? <div className="json-viewer-root">{content}</div> : content
   }
 
   if (typeof src === 'object') {
-    const keys = Object.keys(src);
+    const keys = Object.keys(src)
     if (keys.length === 0) return (
       <span
         className="json-empty"
@@ -195,7 +195,7 @@ const JsonViewer = ({ src, name = 'root', expanded = true, depth = 0 }) => {
       >
         <span className="type-icon">{ }</span>{ }
       </span>
-    );
+    )
 
     const content = (
       <div className="json-container">
@@ -235,9 +235,9 @@ const JsonViewer = ({ src, name = 'root', expanded = true, depth = 0 }) => {
           </div>
         )}
       </div>
-    );
+    )
 
-    return isRoot ? <div className="json-viewer-root">{content}</div> : content;
+    return isRoot ? <div className="json-viewer-root">{content}</div> : content
   }
 
   return (
@@ -248,7 +248,7 @@ const JsonViewer = ({ src, name = 'root', expanded = true, depth = 0 }) => {
     >
       {src}
     </span>
-  );
-};
+  )
+}
 
-export default JsonViewer;
+export default JsonViewer

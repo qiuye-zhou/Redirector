@@ -1,11 +1,11 @@
-import React from 'react';
+import React from 'react'
 
 const Sidebar = ({ activeTab, onTabChange }) => {
   const tabs = [
     { id: 'API', icon: '🔗', label: 'API' },
     { id: '全局', icon: '🌐', label: '全局' },
     { id: '设置', icon: '⚙️', label: '设置' }
-  ];
+  ]
 
   return (
     <div className="sidebar">
@@ -20,7 +20,7 @@ const Sidebar = ({ activeTab, onTabChange }) => {
         </div>
       ))}
     </div>
-  );
-};
+  )
+}
 
-export default Sidebar;
+export default Sidebar

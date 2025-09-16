@@ -1,82 +1,82 @@
-import React, { useState, useEffect } from 'react';
-import { useApiConfig } from '../../context/ApiConfigContext';
-import { useShouldShowProxy } from '../../hooks/useShouldShowProxy';
-import './styles.css';
+import React, { useState, useEffect } from 'react'
+import { useApiConfig } from '../../context/ApiConfigContext'
+import { useShouldShowProxy } from '../../hooks/useShouldShowProxy'
+import './styles.css'
 
 const Popup = () => {
-  const [status, setStatus] = useState('检查中...');
-  const [statusColor, setStatusColor] = useState('#666');
-  const [currentApiUrl, setCurrentApiUrl] = useState('');
-  const [newPattern, setNewPattern] = useState('');
-  const [editingPattern, setEditingPattern] = useState(null);
-  const [editValue, setEditValue] = useState('');
+  const [status, setStatus] = useState('检查中...')
+  const [statusColor, setStatusColor] = useState('#666')
+  const [currentApiUrl, setCurrentApiUrl] = useState('')
+  const [newPattern, setNewPattern] = useState('')
+  const [editingPattern, setEditingPattern] = useState(null)
+  const [editValue, setEditValue] = useState('')
 
   // 从 webpack 注入的环境变量获取版本信息
-  const version = process.env.VERSION || '0.1.0';
-  const packageName = process.env.PACKAGE_NAME || 'redirector';
-  const buildTime = process.env.BUILD_TIME || new Date().toLocaleString();
+  const version = process.env.VERSION || '0.1.0'
+  const packageName = process.env.PACKAGE_NAME || 'redirector'
+  const buildTime = process.env.BUILD_TIME || new Date().toLocaleString()
 
-  const { addRequest } = useApiConfig();
-  const { shouldShowProxy, addShouldShowProxy, removeShouldShowProxy } = useShouldShowProxy();
+  const { addRequest } = useApiConfig()
+  const { shouldShowProxy, addShouldShowProxy, removeShouldShowProxy } = useShouldShowProxy()
 
   // 获取存储信息
   const getStorageInfo = async () => {
     try {
-      const result = await chrome.storage.local.get(['currentApiUrl']);
+      const result = await chrome.storage.local.get(['currentApiUrl'])
 
       if (result.currentApiUrl) {
-        setCurrentApiUrl(result.currentApiUrl);
-        setStatus(`重定向地址: ${result.currentApiUrl}`);
-        setStatusColor('#81c784');
+        setCurrentApiUrl(result.currentApiUrl)
+        setStatus(`重定向地址: ${result.currentApiUrl}`)
+        setStatusColor('#81c784')
       } else {
-        setCurrentApiUrl('');
-        setStatus('未设置重定向地址');
-        setStatusColor('#e57373');
+        setCurrentApiUrl('')
+        setStatus('未设置重定向地址')
+        setStatusColor('#e57373')
       }
     } catch (error) {
-      console.error('获取存储信息失败:', error);
+      console.error('获取存储信息失败:', error)
     }
-  };
+  }
 
   // 添加新的正则模式
   const handleAddPattern = () => {
     if (newPattern.trim()) {
-      addShouldShowProxy(newPattern.trim());
-      setNewPattern('');
+      addShouldShowProxy(newPattern.trim())
+      setNewPattern('')
     }
-  };
+  }
 
   // 删除正则模式
   const handleRemovePattern = (pattern) => {
-    removeShouldShowProxy(pattern);
-  };
+    removeShouldShowProxy(pattern)
+  }
 
   // 开始编辑模式
   const handleStartEdit = (pattern) => {
-    setEditingPattern(pattern);
-    setEditValue(pattern);
-  };
+    setEditingPattern(pattern)
+    setEditValue(pattern)
+  }
 
   // 保存编辑
   const handleSaveEdit = () => {
     if (editValue.trim() && editingPattern) {
-      removeShouldShowProxy(editingPattern);
-      addShouldShowProxy(editValue.trim());
-      setEditingPattern(null);
-      setEditValue('');
+      removeShouldShowProxy(editingPattern)
+      addShouldShowProxy(editValue.trim())
+      setEditingPattern(null)
+      setEditValue('')
     }
-  };
+  }
 
   // 取消编辑
   const handleCancelEdit = () => {
-    setEditingPattern(null);
-    setEditValue('');
-  };
+    setEditingPattern(null)
+    setEditValue('')
+  }
 
   useEffect(() => {
     // 初始化检查
-    getStorageInfo();
-  }, []);
+    getStorageInfo()
+  }, [])
 
   return (
     <div className="popup-container">
@@ -161,7 +161,7 @@ const Popup = () => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Popup;
+export default Popup

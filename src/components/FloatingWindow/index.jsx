@@ -1,57 +1,57 @@
-import React, { useState, useEffect, useRef } from 'react';
-import Sidebar from '../Sidebar';
-import RequestList from '../RequestList';
-import ApiConfig from '../ApiConfig';
-import './styles.css';
-import { useApiConfig } from '../../context/ApiConfigContext';
-import { useShouldShowProxy } from '../../hooks/useShouldShowProxy';
+import React, { useState, useEffect, useRef } from 'react'
+import Sidebar from '../Sidebar'
+import RequestList from '../RequestList'
+import ApiConfig from '../ApiConfig'
+import './styles.css'
+import { useApiConfig } from '../../context/ApiConfigContext'
+import { useShouldShowProxy } from '../../hooks/useShouldShowProxy'
 
 const FloatingWindow = () => {
-  const [activeTab, setActiveTab] = useState('API');
-  const [isVisible, setIsVisible] = useState(false);
+  const [activeTab, setActiveTab] = useState('API')
+  const [isVisible, setIsVisible] = useState(false)
 
-  const floatingButtonRef = useRef(null);
-  const { addRequest } = useApiConfig();
-  const { shouldShowProxy } = useShouldShowProxy();
+  const floatingButtonRef = useRef(null)
+  const { addRequest } = useApiConfig()
+  const { shouldShowProxy } = useShouldShowProxy()
 
   // 监听来自 background 的消息
   useEffect(() => {
     const onMessage = (message) => {
       if (message.type === 'API_RESPONSE') {
-        const { url, responseText } = message.data;
-        addRequest({ url, response: { url, responseText } });
+        const { url, responseText } = message.data
+        addRequest({ url, response: { url, responseText } })
       }
-    };
+    }
 
-    chrome.runtime.onMessage.addListener(onMessage);
-    return () => chrome.runtime.onMessage.removeListener(onMessage);
-  }, [addRequest]);
+    chrome.runtime.onMessage.addListener(onMessage)
+    return () => chrome.runtime.onMessage.removeListener(onMessage)
+  }, [addRequest])
 
   const renderContent = () => {
     switch (activeTab) {
       case 'API':
-        return <ApiConfig />;
+        return <ApiConfig />
       case '全局':
-        return <RequestList />;
+        return <RequestList />
       case '设置':
-        return <div>其他功能待完善~</div>;
+        return <div>其他功能待完善~</div>
       default:
-        return null;
+        return null
     }
-  };
+  }
 
   // 检查是否显示代理功能 - 使用从 hook 获取的状态
   const isShouldShowProxy = shouldShowProxy.some(pattern => {
     try {
-      const regex = new RegExp(pattern);
-      return regex.test(window.location.href);
+      const regex = new RegExp(pattern)
+      return regex.test(window.location.href)
     } catch (error) {
-      console.warn('Invalid regex pattern:', pattern);
-      return false;
+      console.warn('Invalid regex pattern:', pattern)
+      return false
     }
-  });
+  })
 
-  if (!isShouldShowProxy) return null;
+  if (!isShouldShowProxy) return null
 
   return (
     <>
@@ -78,7 +78,7 @@ const FloatingWindow = () => {
         </div>
       )}
     </>
-  );
-};
+  )
+}
 
-export default FloatingWindow;
+export default FloatingWindow
