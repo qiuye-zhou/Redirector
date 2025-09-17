@@ -13,7 +13,12 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2) !important;
   color: white !important;
   font-size: 18px !important;
-  transition: all 0.2s ease-in-out !important;
+  transition: all 0.3s ease-in-out !important;
+  transform: translate(0, 0) !important;
+}
+
+.floating-button.hidden {
+  transform: translate(50%, 50%) !important;
 }
 
 .floating-button:hover {

@@ -9,8 +9,11 @@ import { useShouldShowProxy } from '../../hooks/useShouldShowProxy'
 const FloatingWindow = () => {
   const [activeTab, setActiveTab] = useState('API')
   const [isVisible, setIsVisible] = useState(false)
+  const [isButtonHovered, setIsButtonHovered] = useState(false)
+  const [isButtonHidden, setIsButtonHidden] = useState(false)
 
   const floatingButtonRef = useRef(null)
+  const hideTimerRef = useRef(null)
   const { addRequest } = useApiConfig()
   const { shouldShowProxy } = useShouldShowProxy()
 
@@ -26,6 +29,32 @@ const FloatingWindow = () => {
     chrome.runtime.onMessage.addListener(onMessage)
     return () => chrome.runtime.onMessage.removeListener(onMessage)
   }, [addRequest])
+
+  // 按钮自动隐藏逻辑
+  useEffect(() => {
+    // 清除之前的定时器
+    if (hideTimerRef.current) {
+      clearTimeout(hideTimerRef.current)
+      hideTimerRef.current = null
+    }
+
+    if (!isVisible && !isButtonHovered) {
+      // 设置新的定时器，3秒后隐藏按钮
+      hideTimerRef.current = setTimeout(() => {
+        setIsButtonHidden(true)
+      }, 3000)
+    } else if (isButtonHovered && isButtonHidden) {
+      // 鼠标悬停时立即显示按钮
+      setIsButtonHidden(false)
+    }
+
+    return () => {
+      if (hideTimerRef.current) {
+        clearTimeout(hideTimerRef.current)
+        hideTimerRef.current = null
+      }
+    }
+  }, [isVisible, isButtonHovered, isButtonHidden])
 
   const renderContent = () => {
     switch (activeTab) {
@@ -57,8 +86,15 @@ const FloatingWindow = () => {
     <>
       <button
         ref={floatingButtonRef}
-        className="floating-button"
-        onClick={() => setIsVisible(!isVisible)}
+        className={`floating-button ${isButtonHidden ? 'hidden' : ''}`}
+        onClick={() => {
+          setIsVisible(!isVisible)
+          if (!isVisible) {
+            setIsButtonHidden(false) // 打开窗口时显示按钮
+          }
+        }}
+        onMouseEnter={() => setIsButtonHovered(true)}
+        onMouseLeave={() => setIsButtonHovered(false)}
       >
         🔧
       </button>
