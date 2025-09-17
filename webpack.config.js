@@ -1,10 +1,15 @@
-const path = require('path')
-const CopyPlugin = require('copy-webpack-plugin')
-const UnoCSS = require('unocss/webpack').default
-const webpack = require('webpack')
-const packageJson = require('./package.json')
+import path from 'path'
+import CopyPlugin from 'copy-webpack-plugin'
+import UnoCSS from 'unocss/webpack'
+import webpack from 'webpack'
+import { readFileSync } from 'fs'
+import { fileURLToPath } from 'url'
 
-module.exports = {
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+const packageJson = JSON.parse(readFileSync('./package.json', 'utf8'))
+
+export default {
   mode: 'production',
   entry: {
     content: './src/content.js',
