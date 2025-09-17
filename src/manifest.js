@@ -9,7 +9,7 @@ export async function getManifest() {
     version: pkg.version,
     description: pkg.description,
     action: {
-      // default_icon: './assets/logo.png',
+      default_icon: './assets/logo.png',
       default_popup: 'popup.html',
     },
     permissions: [
@@ -29,11 +29,11 @@ export async function getManifest() {
       "service_worker": "background.js",
       "type": "module"
     },
-    // icons: {
-    //   "16": "icon16.png",
-    //   "48": "icon48.png",
-    //   "128": "icon128.png"
-    // },
+    icons: {
+      16: './assets/logo.png',
+      48: './assets/logo.png',
+      128: './assets/logo.png',
+    },
     content_scripts: [
       {
         "matches": ["<all_urls>"],
