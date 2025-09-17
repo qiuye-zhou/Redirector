@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useApiConfig } from '../../context/ApiConfigContext'
+import { useApiConfig } from '@/context/ApiConfigContext'
 import Button from 'antd/es/button'
 import Input from 'antd/es/input'
 import 'antd/es/button/style'

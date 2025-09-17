@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import { useApiConfig } from '../../context/ApiConfigContext'
-import { useShouldShowProxy } from '../../hooks/useShouldShowProxy'
+import { useApiConfig } from '@/context/ApiConfigContext'
+import { useShouldShowProxy } from '@/hooks/useShouldShowProxy'
 import './styles.css'
 
 const Popup = () => {

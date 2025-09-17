@@ -3,8 +3,8 @@ import Sidebar from '../Sidebar'
 import RequestList from '../RequestList'
 import ApiConfig from '../ApiConfig'
 import './styles.css'
-import { useApiConfig } from '../../context/ApiConfigContext'
-import { useShouldShowProxy } from '../../hooks/useShouldShowProxy'
+import { useApiConfig } from '@/context/ApiConfigContext'
+import { useShouldShowProxy } from '@/hooks/useShouldShowProxy'
 
 const FloatingWindow = () => {
   const [activeTab, setActiveTab] = useState('API')

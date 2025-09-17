@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import JsonViewer from '../JsonViewer'
-import { useApiConfig } from '../../context/ApiConfigContext'
+import { useApiConfig } from '@/context/ApiConfigContext'
 import './styles.css'
 
 const RequestList = () => {
