@@ -22,24 +22,13 @@
 2. 配置代理规则（默认支持 localhost 和 127.0.0.1）
 3. 访问匹配规则的页面，API 请求将被重定向
 
-### 调试信息
-
-扩展会在控制台输出详细的调试信息：
-
-- `[Background]` - 后台脚本日志
-- `[Content]` - 内容脚本日志
-- `FloatingWindow` - 浮动窗口组件日志
-- `RequestList` - 请求列表组件日志
-
-## 开发
-
-- `npm run dev` - 开发模式
-- `npm run build` - 生产构建
-- `npm run watch` - 监听文件变化
-
 ## 技术栈
 
 - React 18
 - Chrome Extension APIs
 - Webpack 5
 - UnoCSS
+
+## 许可证
+
+MIT License - 详见 [LICENSE](LICENSE) 文件
