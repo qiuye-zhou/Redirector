@@ -12,7 +12,7 @@ const initApp = () => {
       root.render(
         <React.StrictMode>
           <App />
-        </React.StrictMode>
+        </React.StrictMode>,
       )
       console.log('React app mounted successfully')
     } catch (error) {
@@ -32,7 +32,11 @@ const retryMount = (attempts = 0) => {
   } else {
     setTimeout(() => {
       initApp()
-      if (!document.getElementById('chrome-extension-root')?.hasAttribute('data-react-mounted')) {
+      if (
+        !document
+          .getElementById('chrome-extension-root')
+          ?.hasAttribute('data-react-mounted')
+      ) {
         retryMount(attempts + 1)
       }
     }, 1000)

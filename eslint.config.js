@@ -1,79 +1,38 @@
-module.exports = [
+// eslint.config.js
+import react from 'eslint-plugin-react';
+import tsParser from '@typescript-eslint/parser';
+import prettier from 'eslint-plugin-prettier';
+import prettierConfig from 'eslint-config-prettier';
+
+export default [
   {
-    files: ['**/*.{js,jsx}'],
-    ignores: [
-      'node_modules/**',
-      'dist/**',
-      'build/**',
-      'extensions/**',
-      '*.min.js',
-      'coverage/**'
-    ],
+    files: ['src/**/*.{js,jsx}'],
     languageOptions: {
-      ecmaVersion: 'latest',
-      sourceType: 'module',
-      globals: {
-        // Node.js globals
-        __dirname: 'readonly',
-        require: 'readonly',
-        module: 'readonly',
-        exports: 'readonly',
-
-        // Browser globals
-        window: 'readonly',
-        document: 'readonly',
-        navigator: 'readonly',
-        console: 'readonly',
-        location: 'readonly',
-        fetch: 'readonly',
-        Promise: 'readonly',
-        setTimeout: 'readonly',
-        clearTimeout: 'readonly',
-        setInterval: 'readonly',
-        clearInterval: 'readonly',
-        btoa: 'readonly',
-        performance: 'readonly',
-        setImmediate: 'readonly',
-        MessageChannel: 'readonly',
-        self: 'readonly',
-        requestAnimationFrame: 'readonly',
-        MutationObserver: 'readonly',
-        DOMRectReadOnly: 'readonly',
-        Element: 'readonly',
-        ShadowRoot: 'readonly',
-        process: 'readonly',
-        HTMLElement: 'readonly',
-        SVGElement: 'readonly',
-        ResizeObserver: 'readonly',
-        CustomEvent: 'readonly',
-        MSApp: 'readonly',
-        queueMicrotask: 'readonly',
-        reportError: 'readonly',
-        getComputedStyle: 'readonly',
-        __REACT_DEVTOOLS_GLOBAL_HOOK__: 'readonly',
-
-        // WebExtensions globals
-        chrome: 'readonly',
-        browser: 'readonly'
-      },
+      parser: tsParser,
       parserOptions: {
         ecmaFeatures: {
-          jsx: true
-        }
-      }
+          jsx: true,
+        },
+        ecmaVersion: 2020,
+        sourceType: 'module',
+      },
     },
     plugins: {
-      react: require('eslint-plugin-react')
+      react: react,
+      prettier: prettier,
+    },
+    rules: {
+      ...prettierConfig.rules,
+      'prettier/prettier': 'error',
+      semi: ['error', 'never'], // 不要求分号
+      curly: 'warn',
+      eqeqeq: 'warn',
+      'no-throw-literal': 'warn',
     },
     settings: {
       react: {
-        version: 'detect'
-      }
+        version: 'detect',
+      },
     },
-    rules: {
-      'no-undef': 'warn',
-      'react/react-in-jsx-scope': 'off', // React 17+ 不需要显式导入 React
-      'semi': ['error', 'never'] // 禁止语句末尾使用分号
-    }
-  }
-]
+  },
+];

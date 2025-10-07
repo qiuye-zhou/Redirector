@@ -29,22 +29,25 @@ async function updateRedirectRules() {
   try {
     // 清除现有规则
     const existingRules = await chrome.declarativeNetRequest.getDynamicRules()
-    const ruleIdsToRemove = existingRules.map(rule => rule.id)
+    const ruleIdsToRemove = existingRules.map((rule) => rule.id)
 
     if (ruleIdsToRemove.length > 0) {
       await chrome.declarativeNetRequest.updateDynamicRules({
-        removeRuleIds: ruleIdsToRemove
+        removeRuleIds: ruleIdsToRemove,
       })
 
       // 等待规则清除完成
-      await new Promise(resolve => setTimeout(resolve, 100))
+      await new Promise((resolve) => setTimeout(resolve, 100))
     }
 
     // 如果有API URL，添加新规则
     if (currentApiUrlCache) {
       // 获取代理配置
       const result = await chrome.storage.local.get(['shouldShowProxy'])
-      const patterns = result.shouldShowProxy || ['^https?://localhost', '^https?://127\\.0\\.0\\.1']
+      const patterns = result.shouldShowProxy || [
+        '^https?://localhost',
+        '^https?://127\\.0\\.0\\.1',
+      ]
 
       const rules = []
 
@@ -53,7 +56,8 @@ async function updateRedirectRules() {
         const pattern = patterns[i]
         try {
           // 将模式转换为适合 declarativeNetRequest 的格式
-          const regexFilter = pattern.replace(/^\^/, '').replace(/\$$/, '') + '([^/]*(.*))'
+          const regexFilter =
+            pattern.replace(/^\^/, '').replace(/\$$/, '') + '([^/]*(.*))'
 
           // 使用全局计数器生成唯一ID
           const uniqueId = ruleIdCounter++
@@ -62,15 +66,15 @@ async function updateRedirectRules() {
             id: uniqueId,
             priority: 1,
             action: {
-              type: "redirect",
+              type: 'redirect',
               redirect: {
-                regexSubstitution: currentApiUrlCache + "\\2"
-              }
+                regexSubstitution: currentApiUrlCache + '\\2',
+              },
             },
             condition: {
               regexFilter: regexFilter,
-              resourceTypes: ["xmlhttprequest"]
-            }
+              resourceTypes: ['xmlhttprequest'],
+            },
           })
         } catch (error) {
           console.warn('[Background] 跳过无效的正则表达式模式:', pattern, error)
@@ -79,10 +83,15 @@ async function updateRedirectRules() {
 
       if (rules.length > 0) {
         await chrome.declarativeNetRequest.updateDynamicRules({
-          addRules: rules
+          addRules: rules,
         })
 
-        console.log('[Background] 重定向规则已更新:', currentApiUrlCache, '规则数量:', rules.length)
+        console.log(
+          '[Background] 重定向规则已更新:',
+          currentApiUrlCache,
+          '规则数量:',
+          rules.length,
+        )
       } else {
         console.log('[Background] 没有有效的代理模式，无法创建重定向规则')
       }
@@ -117,13 +126,16 @@ chrome.webRequest.onCompleted.addListener(
             data: {
               url: originalUrl,
               redirectedUrl: details.url,
-              responseText: { message: '请求已重定向', url: details.url }
-            }
+              responseText: { message: '请求已重定向', url: details.url },
+            },
           }
 
           chrome.tabs.sendMessage(tabs[0].id, message, (response) => {
             if (chrome.runtime.lastError) {
-              console.warn('[Background] 消息发送失败:', chrome.runtime.lastError.message)
+              console.warn(
+                '[Background] 消息发送失败:',
+                chrome.runtime.lastError.message,
+              )
             }
           })
         }
@@ -131,9 +143,9 @@ chrome.webRequest.onCompleted.addListener(
     }
   },
   {
-    urls: ["<all_urls>"],
-    types: ["xmlhttprequest"]
-  }
+    urls: ['<all_urls>'],
+    types: ['xmlhttprequest'],
+  },
 )
 
 // 监听请求开始事件，用于调试
@@ -143,9 +155,12 @@ chrome.webRequest.onBeforeRequest.addListener(
 
     try {
       const result = await chrome.storage.local.get(['shouldShowProxy'])
-      const patterns = result.shouldShowProxy || ['^https?://localhost', '^https?://127\\.0\\.0\\.1']
+      const patterns = result.shouldShowProxy || [
+        '^https?://localhost',
+        '^https?://127\\.0\\.0\\.1',
+      ]
 
-      const shouldProxy = patterns.some(pattern => {
+      const shouldProxy = patterns.some((pattern) => {
         try {
           const regex = new RegExp(pattern)
           return regex.test(requestUrl)
@@ -163,9 +178,9 @@ chrome.webRequest.onBeforeRequest.addListener(
     }
   },
   {
-    urls: ["<all_urls>"],
-    types: ["xmlhttprequest"]
-  }
+    urls: ['<all_urls>'],
+    types: ['xmlhttprequest'],
+  },
 )
 
 // 消息监听

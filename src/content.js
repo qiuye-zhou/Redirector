@@ -8,11 +8,15 @@ let isInitialized = false
 
 // 初始化 React 组件
 function initializeReactApp() {
-  if (isInitialized) return
+  if (isInitialized) {
+    return
+  }
 
   // 检查是否已经存在容器
   let container = document.getElementById('g-plugin-root')
-  if (container) return
+  if (container) {
+    return
+  }
 
   container = document.createElement('div')
   container.id = 'g-plugin-root'
@@ -28,15 +32,20 @@ function initializeReactApp() {
 // 初始化函数
 function initialize() {
   // 如果已经初始化过，直接返回
-  if (isInitialized) return
+  if (isInitialized) {
+    return
+  }
 
   // 初始化 React 应用
   initializeReactApp()
 
   // 获取 API URL
-  chrome.runtime.sendMessage({ type: "GET_CURRENT_API_URL" }, (response) => {
+  chrome.runtime.sendMessage({ type: 'GET_CURRENT_API_URL' }, (response) => {
     if (chrome.runtime.lastError) {
-      console.warn('[Content] 获取API URL失败:', chrome.runtime.lastError.message)
+      console.warn(
+        '[Content] 获取API URL失败:',
+        chrome.runtime.lastError.message,
+      )
       return
     }
     if (response && response.currentApiUrl) {
@@ -56,16 +65,20 @@ if (document.readyState === 'loading') {
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === 'API_RESPONSE') {
     // 发送消息到 React 组件
-    window.dispatchEvent(new CustomEvent('g-plugin-request', {
-      detail: message.data
-    }))
+    window.dispatchEvent(
+      new CustomEvent('g-plugin-request', {
+        detail: message.data,
+      }),
+    )
   }
 
   if (message.type === 'NEW_REQUEST' || message.type === 'REQUEST_COMPLETED') {
     // 发送消息到 React 组件
-    window.dispatchEvent(new CustomEvent('g-plugin-request', {
-      detail: message.data
-    }))
+    window.dispatchEvent(
+      new CustomEvent('g-plugin-request', {
+        detail: message.data,
+      }),
+    )
   }
 
   return true

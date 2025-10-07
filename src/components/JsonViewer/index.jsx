@@ -11,7 +11,8 @@ const JsonViewer = ({ src, name = 'root', expanded = true, depth = 0 }) => {
 
   // 复制到剪贴板功能
   const copyToClipboard = useCallback((value) => {
-    const textToCopy = typeof value === 'string' ? value : JSON.stringify(value, null, 2)
+    const textToCopy =
+      typeof value === 'string' ? value : JSON.stringify(value, null, 2)
     navigator.clipboard.writeText(textToCopy).then(() => {
       // 显示复制成功提示
       const tooltip = document.createElement('div')
@@ -32,55 +33,79 @@ const JsonViewer = ({ src, name = 'root', expanded = true, depth = 0 }) => {
   }, [])
 
   // 右键菜单处理
-  const handleContextMenu = useCallback((e) => {
-    e.preventDefault()
-    copyToClipboard(src)
-  }, [src, copyToClipboard])
-
-  // 键盘事件处理
-  const handleKeyDown = useCallback((e) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault()
-      setIsExpanded(!isExpanded)
-    } else if (e.key === 'c' && (e.ctrlKey || e.metaKey)) {
+  const handleContextMenu = useCallback(
+    (e) => {
       e.preventDefault()
       copyToClipboard(src)
-    }
-  }, [isExpanded, src, copyToClipboard])
+    },
+    [src, copyToClipboard],
+  )
+
+  // 键盘事件处理
+  const handleKeyDown = useCallback(
+    (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault()
+        setIsExpanded(!isExpanded)
+      } else if (e.key === 'c' && (e.ctrlKey || e.metaKey)) {
+        e.preventDefault()
+        copyToClipboard(src)
+      }
+    },
+    [isExpanded, src, copyToClipboard],
+  )
 
   // 获取数据类型图标
   const getTypeIcon = (value) => {
-    if (value === null) return '∅'
-    if (value === undefined) return '?'
-    if (typeof value === 'string') return '"'
-    if (typeof value === 'number') return '#'
-    if (typeof value === 'boolean') return value ? '✓' : '✗'
-    if (Array.isArray(value)) return '[]'
-    if (typeof value === 'object') return '{}'
+    if (value === null) {
+      return '∅'
+    }
+    if (value === undefined) {
+      return '?'
+    }
+    if (typeof value === 'string') {
+      return '"'
+    }
+    if (typeof value === 'number') {
+      return '#'
+    }
+    if (typeof value === 'boolean') {
+      return value ? '✓' : '✗'
+    }
+    if (Array.isArray(value)) {
+      return '[]'
+    }
+    if (typeof value === 'object') {
+      return '{}'
+    }
     return '•'
   }
 
-  if (src === null) return (
-    <span
-      className="json-null"
-      ref={elementRef}
-      onContextMenu={handleContextMenu}
-      title="右键复制"
-    >
-      <span className="type-icon">∅</span> null
-    </span>
-  )
+  if (src === null) {
+    return (
+      <span
+        className="json-null"
+        ref={elementRef}
+        onContextMenu={handleContextMenu}
+        title="右键复制"
+      >
+        <span className="type-icon">∅</span> null
+      </span>
+    )
+  }
 
-  if (src === undefined) return (
-    <span
-      className="json-undefined"
-      ref={elementRef}
-      onContextMenu={handleContextMenu}
-      title="右键复制"
-    >
-      <span className="type-icon">?</span> undefined
-    </span>
-  )
+  if (src === undefined) {
+    return (
+      <span
+        className="json-undefined"
+        ref={elementRef}
+        onContextMenu={handleContextMenu}
+        title="右键复制"
+      >
+        <span className="type-icon">?</span> undefined
+      </span>
+    )
+  }
 
   if (typeof src === 'string') {
     return (
@@ -108,7 +133,8 @@ const JsonViewer = ({ src, name = 'root', expanded = true, depth = 0 }) => {
         onMouseLeave={() => setIsHovered(false)}
         title="数字 - 右键复制"
       >
-        <span className="type-icon">#</span>{src}
+        <span className="type-icon">#</span>
+        {src}
         {isHovered && <span className="copy-hint">📋</span>}
       </span>
     )
@@ -124,23 +150,26 @@ const JsonViewer = ({ src, name = 'root', expanded = true, depth = 0 }) => {
         onMouseLeave={() => setIsHovered(false)}
         title="布尔值 - 右键复制"
       >
-        <span className="type-icon">{src ? '✓' : '✗'}</span>{src.toString()}
+        <span className="type-icon">{src ? '✓' : '✗'}</span>
+        {src.toString()}
         {isHovered && <span className="copy-hint">📋</span>}
       </span>
     )
   }
 
   if (Array.isArray(src)) {
-    if (src.length === 0) return (
-      <span
-        className="json-empty"
-        ref={elementRef}
-        onContextMenu={handleContextMenu}
-        title="空数组 - 右键复制"
-      >
-        <span className="type-icon">[]</span>[]
-      </span>
-    )
+    if (src.length === 0) {
+      return (
+        <span
+          className="json-empty"
+          ref={elementRef}
+          onContextMenu={handleContextMenu}
+          title="空数组 - 右键复制"
+        >
+          <span className="type-icon">[]</span>[]
+        </span>
+      )
+    }
 
     const content = (
       <div className="json-container">
@@ -162,7 +191,10 @@ const JsonViewer = ({ src, name = 'root', expanded = true, depth = 0 }) => {
           <span className="copy-hint-toggle">📋</span>
         </span>
         {isExpanded && (
-          <div className="json-content json-content-animated" style={{ marginLeft: `${depth * 20}px` }}>
+          <div
+            className="json-content json-content-animated"
+            style={{ marginLeft: `${depth * 20}px` }}
+          >
             {src.map((item, index) => (
               <div key={index} className="json-item">
                 <span className="json-key">
@@ -186,16 +218,19 @@ const JsonViewer = ({ src, name = 'root', expanded = true, depth = 0 }) => {
 
   if (typeof src === 'object') {
     const keys = Object.keys(src)
-    if (keys.length === 0) return (
-      <span
-        className="json-empty"
-        ref={elementRef}
-        onContextMenu={handleContextMenu}
-        title="空对象 - 右键复制"
-      >
-        <span className="type-icon">{ }</span>{ }
-      </span>
-    )
+    if (keys.length === 0) {
+      return (
+        <span
+          className="json-empty"
+          ref={elementRef}
+          onContextMenu={handleContextMenu}
+          title="空对象 - 右键复制"
+        >
+          <span className="type-icon">{}</span>
+          {}
+        </span>
+      )
+    }
 
     const content = (
       <div className="json-container">
@@ -212,14 +247,17 @@ const JsonViewer = ({ src, name = 'root', expanded = true, depth = 0 }) => {
           title={`对象 (${keys.length} 属性) - 点击展开/折叠, 右键复制`}
         >
           <span className="expand-icon">{isExpanded ? '▼' : '▶'}</span>
-          <span className="type-icon">{ }</span>
+          <span className="type-icon">{}</span>
           <span className="object-name">{name}</span>
           <span className="item-count">({keys.length})</span>
           <span className="copy-hint-toggle">📋</span>
         </span>
         {isExpanded && (
-          <div className="json-content json-content-animated" style={{ marginLeft: `${depth * 20}px` }}>
-            {keys.map(key => (
+          <div
+            className="json-content json-content-animated"
+            style={{ marginLeft: `${depth * 20}px` }}
+          >
+            {keys.map((key) => (
               <div key={key} className="json-item">
                 <span className="json-key">
                   <span className="object-key">{key}</span>:
@@ -241,11 +279,7 @@ const JsonViewer = ({ src, name = 'root', expanded = true, depth = 0 }) => {
   }
 
   return (
-    <span
-      ref={elementRef}
-      onContextMenu={handleContextMenu}
-      title="右键复制"
-    >
+    <span ref={elementRef} onContextMenu={handleContextMenu} title="右键复制">
       {src}
     </span>
   )

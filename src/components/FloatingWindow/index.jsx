@@ -70,7 +70,7 @@ const FloatingWindow = () => {
   }
 
   // 检查是否显示代理功能 - 使用从 hook 获取的状态
-  const isShouldShowProxy = shouldShowProxy.some(pattern => {
+  const isShouldShowProxy = shouldShowProxy.some((pattern) => {
     try {
       const regex = new RegExp(pattern)
       return regex.test(window.location.href)
@@ -80,7 +80,9 @@ const FloatingWindow = () => {
     }
   })
 
-  if (!isShouldShowProxy) return null
+  if (!isShouldShowProxy) {
+    return null
+  }
 
   return (
     <>
@@ -103,7 +105,10 @@ const FloatingWindow = () => {
         <div className="floating-window">
           <div className="window-header">
             <h3>接口配置</h3>
-            <button className="close-button" onClick={() => setIsVisible(false)}>
+            <button
+              className="close-button"
+              onClick={() => setIsVisible(false)}
+            >
               ×
             </button>
           </div>

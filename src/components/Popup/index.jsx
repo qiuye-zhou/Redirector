@@ -17,7 +17,8 @@ const Popup = () => {
   const buildTime = process.env.BUILD_TIME || new Date().toLocaleString()
 
   const { addRequest } = useApiConfig()
-  const { shouldShowProxy, addShouldShowProxy, removeShouldShowProxy } = useShouldShowProxy()
+  const { shouldShowProxy, addShouldShowProxy, removeShouldShowProxy } =
+    useShouldShowProxy()
 
   // 获取存储信息
   const getStorageInfo = async () => {
@@ -98,9 +99,7 @@ const Popup = () => {
         <div className="info-section">
           <div className="info-item">
             <label>API 地址:</label>
-            <span className="info-value">
-              {currentApiUrl || '未设置'}
-            </span>
+            <span className="info-value">{currentApiUrl || '未设置'}</span>
           </div>
         </div>
 
@@ -134,7 +133,10 @@ const Popup = () => {
                     <button onClick={handleSaveEdit} className="save-edit-btn">
                       保存
                     </button>
-                    <button onClick={handleCancelEdit} className="cancel-edit-btn">
+                    <button
+                      onClick={handleCancelEdit}
+                      className="cancel-edit-btn"
+                    >
                       取消
                     </button>
                   </div>
@@ -142,10 +144,16 @@ const Popup = () => {
                   <div className="pattern-display">
                     <span className="pattern-text">{pattern}</span>
                     <div className="pattern-actions">
-                      <button onClick={() => handleStartEdit(pattern)} className="edit-pattern-btn">
+                      <button
+                        onClick={() => handleStartEdit(pattern)}
+                        className="edit-pattern-btn"
+                      >
                         编辑
                       </button>
-                      <button onClick={() => handleRemovePattern(pattern)} className="remove-pattern-btn">
+                      <button
+                        onClick={() => handleRemovePattern(pattern)}
+                        className="remove-pattern-btn"
+                      >
                         删除
                       </button>
                     </div>

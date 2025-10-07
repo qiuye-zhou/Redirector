@@ -12,5 +12,5 @@ root.render(
     <ApiConfigProvider>
       <Popup />
     </ApiConfigProvider>
-  </React.StrictMode>
+  </React.StrictMode>,
 )

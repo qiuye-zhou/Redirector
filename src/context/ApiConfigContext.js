@@ -39,7 +39,7 @@ function apiConfigReducer(state, action) {
     case 'REMOVE_API_URL':
       return {
         ...state,
-        savedApis: state.savedApis.filter(api => api !== action.payload),
+        savedApis: state.savedApis.filter((api) => api !== action.payload),
       }
     default:
       return state
@@ -57,7 +57,10 @@ const ApiConfigProvider = ({ children }) => {
   useEffect(() => {
     chrome.storage.local.get(['currentApiUrl', 'apiUrls'], (result) => {
       if (result.currentApiUrl) {
-        dispatch({ type: 'SET_CURRENT_API_URL', payload: result.currentApiUrl })
+        dispatch({
+          type: 'SET_CURRENT_API_URL',
+          payload: result.currentApiUrl,
+        })
       }
       if (result.apiUrls && Array.isArray(result.apiUrls)) {
         dispatch({ type: 'SET_SAVED_APIS', payload: result.apiUrls })
@@ -77,16 +80,22 @@ const ApiConfigProvider = ({ children }) => {
     chrome.storage.local.set({ currentApiUrl: url }, () => {
       dispatch({ type: 'SET_CURRENT_API_URL', payload: url })
       // 通知background script更新重定向规则
-      chrome.runtime.sendMessage({
-        type: 'UPDATE_API_URL',
-        apiUrl: url
-      }, (response) => {
-        if (chrome.runtime.lastError) {
-          console.warn('通知background script失败:', chrome.runtime.lastError.message)
-        } else {
-          console.log('API URL已更新，重定向规则已生效:', url)
-        }
-      })
+      chrome.runtime.sendMessage(
+        {
+          type: 'UPDATE_API_URL',
+          apiUrl: url,
+        },
+        (response) => {
+          if (chrome.runtime.lastError) {
+            console.warn(
+              '通知background script失败:',
+              chrome.runtime.lastError.message,
+            )
+          } else {
+            console.log('API URL已更新，重定向规则已生效:', url)
+          }
+        },
+      )
     })
   }
 
@@ -105,7 +114,7 @@ const ApiConfigProvider = ({ children }) => {
   const removeApiUrl = (url) => {
     chrome.storage.local.get('apiUrls', (result) => {
       const apiUrls = result.apiUrls || []
-      const newApiUrls = apiUrls.filter(api => api !== url)
+      const newApiUrls = apiUrls.filter((api) => api !== url)
       chrome.storage.local.set({ apiUrls: newApiUrls }, () => {
         dispatch({ type: 'SET_SAVED_APIS', payload: newApiUrls })
       })

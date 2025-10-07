@@ -13,21 +13,19 @@ export async function getManifest() {
       default_popup: 'popup.html',
     },
     permissions: [
-      "storage",
-      "webRequest",
-      "declarativeNetRequest",
-      "tabs",
-      "scripting"
+      'storage',
+      'webRequest',
+      'declarativeNetRequest',
+      'tabs',
+      'scripting',
     ],
-    "declarative_net_request": {
-      "rule_resources": []
+    declarative_net_request: {
+      rule_resources: [],
     },
-    host_permissions: [
-      "<all_urls>"
-    ],
+    host_permissions: ['<all_urls>'],
     background: {
-      "service_worker": "background.js",
-      "type": "module"
+      service_worker: 'background.js',
+      type: 'module',
     },
     icons: {
       16: './assets/logo.png',
@@ -36,11 +34,11 @@ export async function getManifest() {
     },
     content_scripts: [
       {
-        "matches": ["<all_urls>"],
-        "js": ["content.js"],
-        "css": ["content.css"]
-      }
-    ]
+        matches: ['<all_urls>'],
+        js: ['content.js'],
+        css: ['content.css'],
+      },
+    ],
   }
 
   return manifest
