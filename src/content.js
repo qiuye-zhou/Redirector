@@ -1,7 +1,6 @@
 import React from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App.jsx'
-// import './content.css';
 
 // 防止重复初始化
 let isInitialized = false
