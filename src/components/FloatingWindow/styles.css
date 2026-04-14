@@ -6,6 +6,7 @@
   bottom: 0px !important;
   background-color: #008cff !important;
   border-radius: 20% !important;
+  border: 0 !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
@@ -15,6 +16,7 @@
   font-size: 18px !important;
   transition: all 0.3s ease-in-out !important;
   transform: translate(0, 0) !important;
+  z-index: 2147483647 !important;
 }
 
 .floating-button.hidden {
@@ -22,7 +24,7 @@
 }
 
 .floating-button:hover {
-  background-image: radial-gradient(circle at center, #7cc3fd, transparent);
+  background-image: radial-gradient(circle at center, #36a4ff, transparent);
 }
 
 .floating-window {

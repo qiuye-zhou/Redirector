@@ -1,0 +1,28 @@
+.sidebar {
+  width: 60px !important;
+  border-right: 1px solid #eee !important;
+  background: #f8f9fa !important;
+  padding: 8px 0 !important;
+}
+
+.sidebar-item {
+  padding: 12px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  cursor: pointer !important;
+  color: #666 !important;
+  font-size: 12px !important;
+  text-align: center !important;
+  transition: all 0.3s !important;
+}
+
+.sidebar-icon {
+  font-size: 20px !important;
+  margin-bottom: 4px !important;
+}
+
+.sidebar-item.active {
+  color: #2196F3 !important;
+  background: #e3f2fd !important;
+}

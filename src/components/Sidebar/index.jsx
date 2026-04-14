@@ -1,4 +1,5 @@
 import React from 'react'
+import './styles.css'
 
 const Sidebar = ({ activeTab, onTabChange }) => {
   const tabs = [

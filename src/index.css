@@ -11,3 +11,20 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+#chrome-extension-root {
+  all: initial;
+}
+
+#chrome-extension-root * {
+  all: unset;
+  box-sizing: border-box;
+}
+
+#chrome-extension-root {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 999999;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
