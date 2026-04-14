@@ -1,11 +1,8 @@
 // 存储当前API URL的缓存
 let currentApiUrlCache = null
 
-// 全局规则ID计数器，确保唯一性
-let ruleIdCounter = 1
-
 // 初始化时读取API URL
-chrome.storage.local.get('currentApiUrl', (result) => {
+chrome.storage.local.get(['currentApiUrl', 'shouldShowProxy'], (result) => {
   currentApiUrlCache = result.currentApiUrl || null
   updateRedirectRules()
 })
@@ -17,7 +14,6 @@ chrome.storage.onChanged.addListener((changes) => {
     updateRedirectRules()
   }
 
-  // 监听代理配置变化，更新重定向规则
   if (changes.shouldShowProxy) {
     console.log('[Background] 代理配置已更新，重新生成重定向规则')
     updateRedirectRules()
@@ -27,48 +23,69 @@ chrome.storage.onChanged.addListener((changes) => {
 // 使用declarativeNetRequest API更新重定向规则
 async function updateRedirectRules() {
   try {
-    // 清除现有规则
+    console.log('[Background] 开始更新重定向规则...', currentApiUrlCache)
+
+    // 获取所有现有的动态规则并移除
     const existingRules = await chrome.declarativeNetRequest.getDynamicRules()
     const ruleIdsToRemove = existingRules.map((rule) => rule.id)
 
     if (ruleIdsToRemove.length > 0) {
-      await chrome.declarativeNetRequest.updateDynamicRules({
-        removeRuleIds: ruleIdsToRemove,
-      })
-
-      // 等待规则清除完成
-      await new Promise((resolve) => setTimeout(resolve, 100))
+      console.log('[Background] 清除旧规则 IDs:', ruleIdsToRemove)
     }
 
-    // 如果有API URL，添加新规则
+    // 如果没有要移除的且没有新的要添加，直接返回
+    if (!currentApiUrlCache && ruleIdsToRemove.length === 0) {
+      console.log('[Background] 无变化，跳过更新')
+      return
+    }
+
+    const updateOptions = {
+      removeRuleIds: ruleIdsToRemove,
+      addRules: [],
+    }
+
+    // 如果有API URL，构建新规则
     if (currentApiUrlCache) {
-      // 获取代理配置
       const result = await chrome.storage.local.get(['shouldShowProxy'])
       const patterns = result.shouldShowProxy || [
         '^https?://localhost',
         '^https?://127\\.0\\.0\\.1',
       ]
 
-      const rules = []
+      const newRules = []
 
-      // 为每个模式创建重定向规则
-      for (let i = 0; i < patterns.length; i++) {
-        const pattern = patterns[i]
+      let currentId = 1
+
+      for (const pattern of patterns) {
         try {
-          // 将模式转换为适合 declarativeNetRequest 的格式
-          const regexFilter =
-            pattern.replace(/^\^/, '').replace(/\$$/, '') + '([^/]*(.*))'
+          // 清理 Pattern
+          let cleanPattern = pattern
+          if (cleanPattern.startsWith('^')) {
+            cleanPattern = cleanPattern.substring(1)
+          }
+          if (cleanPattern.endsWith('$')) {
+            cleanPattern = cleanPattern.substring(0, cleanPattern.length - 1)
+          }
 
-          // 使用全局计数器生成唯一ID
-          const uniqueId = ruleIdCounter++
+          // 构建 Regex Filter
+          const regexFilter = `${cleanPattern}(/.*)?`
 
-          rules.push({
-            id: uniqueId,
+          // 测试正则是否合法
+          new RegExp(regexFilter)
+
+          // 构建 Substitution
+          let targetUrl = currentApiUrlCache
+          if (targetUrl.endsWith('/')) {
+            targetUrl = targetUrl.slice(0, -1)
+          }
+
+          newRules.push({
+            id: currentId,
             priority: 1,
             action: {
               type: 'redirect',
               redirect: {
-                regexSubstitution: currentApiUrlCache + '\\2',
+                regexSubstitution: `${targetUrl}\\1`,
               },
             },
             condition: {
@@ -76,105 +93,75 @@ async function updateRedirectRules() {
               resourceTypes: ['xmlhttprequest'],
             },
           })
+
+          console.log(
+            `[Background] 准备规则 ID:${currentId}: ${regexFilter} -> ${targetUrl}\\1`,
+          )
+
+          currentId++ // 递增 ID
         } catch (error) {
-          console.warn('[Background] 跳过无效的正则表达式模式:', pattern, error)
+          console.error('[Background] 构建规则失败，跳过模式:', pattern, error)
         }
       }
 
-      if (rules.length > 0) {
-        await chrome.declarativeNetRequest.updateDynamicRules({
-          addRules: rules,
-        })
-
-        console.log(
-          '[Background] 重定向规则已更新:',
-          currentApiUrlCache,
-          '规则数量:',
-          rules.length,
-        )
-      } else {
-        console.log('[Background] 没有有效的代理模式，无法创建重定向规则')
+      if (newRules.length > 0) {
+        updateOptions.addRules = newRules
       }
+    }
+
+    // 执行更新
+    if (
+      updateOptions.removeRuleIds.length > 0 ||
+      updateOptions.addRules.length > 0
+    ) {
+      await chrome.declarativeNetRequest.updateDynamicRules(updateOptions)
+      console.log(
+        '[Background] ✅ 重定向规则已更新。移除:',
+        updateOptions.removeRuleIds.length,
+        '添加:',
+        updateOptions.addRules.length,
+      )
+
+      // 验证规则是否真正生效
+      const verifyRules = await chrome.declarativeNetRequest.getDynamicRules()
+      console.log('[Background] 当前生效的规则数量:', verifyRules.length)
     } else {
-      console.log('[Background] API URL未设置，清除重定向规则')
+      console.log('[Background] 没有规则需要更新')
     }
   } catch (error) {
-    console.error('[Background] 更新重定向规则失败:', error)
+    console.error('[Background] ❌ 更新重定向规则发生严重错误:', error)
   }
 }
 
 // 监听请求完成事件，用于记录和通知
 chrome.webRequest.onCompleted.addListener(
   (details) => {
-    // 检查是否是重定向后的请求
     if (currentApiUrlCache && details.url.startsWith(currentApiUrlCache)) {
-      // 获取原始URL（从重定向前推导）
-      let originalUrl = details.url
+      // 尝试推导原始 URL (这里依然保持你原有的简单逻辑，但要知道它可能不准确)
+      const pathPart = details.url.substring(currentApiUrlCache.length)
+      // 更好的方式是检查匹配了哪个 pattern，但这里简化处理
+      const originalUrl = `http://localhost${pathPart}`
 
-      // 尝试推导原始URL
-      if (details.url.startsWith(currentApiUrlCache)) {
-        const pathPart = details.url.substring(currentApiUrlCache.length)
-        // 假设原始请求是localhost
-        originalUrl = 'http://localhost' + pathPart
-      }
-
-      // 通知content script
       chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-        if (tabs[0]) {
-          const message = {
-            type: 'API_RESPONSE',
-            data: {
-              url: originalUrl,
-              redirectedUrl: details.url,
-              responseText: { message: '请求已重定向', url: details.url },
+        if (tabs[0] && tabs[0].id) {
+          chrome.tabs.sendMessage(
+            tabs[0].id,
+            {
+              type: 'API_RESPONSE',
+              data: {
+                url: originalUrl,
+                redirectedUrl: details.url,
+                responseText: { message: '请求已重定向', url: details.url },
+              },
             },
-          }
-
-          chrome.tabs.sendMessage(tabs[0].id, message, (response) => {
-            if (chrome.runtime.lastError) {
-              console.warn(
-                '[Background] 消息发送失败:',
-                chrome.runtime.lastError.message,
-              )
-            }
-          })
+            () => {
+              if (chrome.runtime.lastError) {
+                // 忽略错误，通常是因为 tab 刷新或关闭
+              }
+            },
+          )
         }
       })
-    }
-  },
-  {
-    urls: ['<all_urls>'],
-    types: ['xmlhttprequest'],
-  },
-)
-
-// 监听请求开始事件，用于调试
-chrome.webRequest.onBeforeRequest.addListener(
-  async (details) => {
-    const requestUrl = details.url
-
-    try {
-      const result = await chrome.storage.local.get(['shouldShowProxy'])
-      const patterns = result.shouldShowProxy || [
-        '^https?://localhost',
-        '^https?://127\\.0\\.0\\.1',
-      ]
-
-      const shouldProxy = patterns.some((pattern) => {
-        try {
-          const regex = new RegExp(pattern)
-          return regex.test(requestUrl)
-        } catch (error) {
-          console.warn('[Background] 无效的正则表达式模式:', pattern)
-          return false
-        }
-      })
-
-      if (shouldProxy) {
-        // 静默处理，不输出日志
-      }
-    } catch (error) {
-      console.error('[Background] 检查代理配置失败:', error)
     }
   },
   {
@@ -192,6 +179,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
   if (message.type === 'UPDATE_API_URL') {
     currentApiUrlCache = message.apiUrl
+    // 先更新 storage，触发 onChanged 监听器去更新规则，或者直接在这里调用
     chrome.storage.local.set({ currentApiUrl: message.apiUrl }, () => {
       updateRedirectRules()
       sendResponse({ success: true })
