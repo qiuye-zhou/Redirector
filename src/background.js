@@ -135,32 +135,64 @@ async function updateRedirectRules() {
 
 // 监听请求完成事件，用于记录和通知
 chrome.webRequest.onCompleted.addListener(
-  (details) => {
-    if (currentApiUrlCache && details.url.startsWith(currentApiUrlCache)) {
-      // 尝试推导原始 URL (这里依然保持你原有的简单逻辑，但要知道它可能不准确)
-      const pathPart = details.url.substring(currentApiUrlCache.length)
-      // 更好的方式是检查匹配了哪个 pattern，但这里简化处理
-      const originalUrl = `http://localhost${pathPart}`
+  async (details) => {
+    // 基础校验
+    if (!currentApiUrlCache || !details.url.startsWith(currentApiUrlCache)) {
+      return
+    }
 
-      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-        if (tabs[0] && tabs[0].id) {
-          chrome.tabs.sendMessage(
-            tabs[0].id,
-            {
-              type: 'API_RESPONSE',
-              data: {
-                url: originalUrl,
-                redirectedUrl: details.url,
-                responseText: { message: '请求已重定向', url: details.url },
-              },
-            },
-            () => {
-              if (chrome.runtime.lastError) {
-                // 忽略错误，通常是因为 tab 刷新或关闭
-              }
-            },
-          )
+    // 尝试还原原始 URL
+    const pathPart = details.url.substring(currentApiUrlCache.length)
+
+    // 获取配置的模式列表，用于更准确地推断原始主机
+    let originalHost = 'localhost' // 默认值
+    try {
+      const result = await chrome.storage.local.get(['shouldShowProxy'])
+      const patterns = result.shouldShowProxy || [
+        '^https?://localhost',
+        '^https?://127\\.0\\.0\\.1',
+      ]
+
+      if (patterns.some((p) => p.includes('127.0.0.1'))) {
+        // 如果配置里明确有 127.0.0.1，且不确定，可以优先用 127.0.0.1 或者保持 localhost
+      }
+      originalHost = 'localhost'
+    } catch (e) {
+      console.warn('[Background] 获取代理配置失败，使用默认 host', e)
+    }
+
+    const originalUrl = `http://${originalHost}${pathPart}`
+
+    // 构建消息数据
+    const messageData = {
+      type: 'API_RESPONSE',
+      data: {
+        url: originalUrl,
+        redirectedUrl: details.url,
+        timestamp: Date.now(),
+        status: details.statusCode,
+        method: details.method,
+      },
+    }
+
+    // 发送消息
+    if (details.tabId && details.tabId !== -1) {
+      chrome.tabs.sendMessage(details.tabId, messageData, (response) => {
+        if (chrome.runtime.lastError) {
+          // 忽略常见错误：tab 已关闭、接收端未连接等
         }
+      })
+    } else {
+      // 如果 tabId 无效（例如来自扩展自身或后台脚本），尝试广播给所有可见标签页
+      chrome.tabs.query({}, (tabs) => {
+        tabs.forEach((tab) => {
+          if (tab.id) {
+            chrome.tabs.sendMessage(tab.id, messageData, () => {
+              if (chrome.runtime.lastError) {
+              }
+            })
+          }
+        })
       })
     }
   },
