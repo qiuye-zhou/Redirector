@@ -1,29 +1,165 @@
-// 存储当前API URL的缓存
-let currentApiUrlCache = null
+// 缓存当前的重定向规则配置
+let redirectRulesCache = []
 
-// 初始化时读取API URL
-chrome.storage.local.get(['currentApiUrl', 'shouldShowProxy'], (result) => {
-  currentApiUrlCache = result.currentApiUrl || null
+// 初始化时读取重定向规则
+chrome.storage.local.get(['redirectRules'], (result) => {
+  redirectRulesCache = result.redirectRules || []
   updateRedirectRules()
 })
 
-// 监听storage变化，更新缓存和规则
+// 监听 storage 变化，更新规则
 chrome.storage.onChanged.addListener((changes) => {
-  if (changes.currentApiUrl) {
-    currentApiUrlCache = changes.currentApiUrl.newValue || null
-    updateRedirectRules()
-  }
-
-  if (changes.shouldShowProxy) {
-    console.log('[Background] 代理配置已更新，重新生成重定向规则')
+  if (changes.redirectRules) {
+    redirectRulesCache = changes.redirectRules.newValue || []
+    console.log('[Background] 重定向规则配置已更新，重新生成规则')
     updateRedirectRules()
   }
 })
 
-// 使用declarativeNetRequest API更新重定向规则
+// 从源模式中提取路径部分（用于判断源/目标路径是否相同）
+// 例如 '^https?://shipinfor\.com/xzh/api/' -> '/xzh/api'
+// 如果不是简单的 URL 模式，返回 null
+function extractPathFromPattern(pattern) {
+  let p = pattern
+  if (p.startsWith('^')) {
+    p = p.substring(1)
+  }
+  if (p.endsWith('$')) {
+    p = p.substring(0, p.length - 1)
+  }
+  const m = p.match(/^https?:\/\/[^/]+(\/.*)?$/)
+  if (!m) {
+    return null
+  }
+  return m[1] ? m[1].replace(/\/$/, '') : ''
+}
+
+// 根据一条重定向规则配置，构建 declarativeNetRequest 规则
+// 返回 null 表示构建失败
+function buildDnrRule(rule, dnrId) {
+  try {
+    const { sourcePattern, targetUrl } = rule
+
+    // 清理源模式（去除首尾的 ^ 和 $）
+    let cleanPattern = sourcePattern
+    if (cleanPattern.startsWith('^')) {
+      cleanPattern = cleanPattern.substring(1)
+    }
+    if (cleanPattern.endsWith('$')) {
+      cleanPattern = cleanPattern.substring(0, cleanPattern.length - 1)
+    }
+
+    const regexFilter = `${cleanPattern}(/.*)?`
+
+    // 测试正则是否合法
+    new RegExp(regexFilter)
+
+    // 解析目标 URL，决定使用 transform 还是 regexSubstitution
+    // transform 方式支持 HTTPS -> HTTP 降级（regexSubstitution 不支持）
+    let targetUrlObj = null
+    let targetPathPrefix = ''
+    try {
+      targetUrlObj = new URL(targetUrl)
+      targetPathPrefix =
+        targetUrlObj.pathname === '/'
+          ? ''
+          : targetUrlObj.pathname.replace(/\/$/, '')
+    } catch (e) {
+      console.error('[Background] 目标 URL 解析失败:', targetUrl, e)
+      return null
+    }
+
+    // 检测源模式中的路径是否与目标路径相同（若是，则只需改 scheme/host/port）
+    const sourcePathPrefix = extractPathFromPattern(sourcePattern)
+    const pathsMatch =
+      sourcePathPrefix !== null && sourcePathPrefix === targetPathPrefix
+
+    if (targetUrlObj && (!targetPathPrefix || pathsMatch)) {
+      // 目标无路径前缀，或源/目标路径相同：
+      // 使用 transform 改变 scheme/host/port，保留原始路径与查询
+      // 此方式支持 HTTPS -> HTTP 降级
+      const transform = {}
+      if (targetUrlObj.protocol === 'http:') {
+        transform.scheme = 'http'
+      } else if (targetUrlObj.protocol === 'https:') {
+        transform.scheme = 'https'
+      }
+      transform.host = targetUrlObj.hostname
+      if (targetUrlObj.port) {
+        transform.port = targetUrlObj.port
+      } else {
+        // 目标无显式端口（默认端口）：必须显式清空，否则会保留原始请求的端口
+        transform.port = ''
+      }
+
+      console.log(
+        `[Background] 准备规则 ID:${dnrId} (transform): ${regexFilter} -> scheme=${transform.scheme}, host=${transform.host}, port=${transform.port || '(默认/清空)'}` +
+          (pathsMatch ? ' (源/目标路径相同，自动用 transform)' : ''),
+      )
+
+      return {
+        id: dnrId,
+        priority: 1,
+        action: {
+          type: 'redirect',
+          redirect: { transform },
+        },
+        condition: {
+          regexFilter: regexFilter,
+          resourceTypes: ['xmlhttprequest'],
+        },
+      }
+    } else {
+      // 目标有路径前缀且与源不同：使用 regexSubstitution 拼接路径
+      // 注意：此方式可能不支持 HTTPS -> HTTP 降级
+      // 修复路径拼接：若源模式以 / 结尾，用 (.*) 捕获剩余（无前导 /）；
+      // 否则用 (/.*)? 捕获路径（含前导 /）。同时不剥离目标末尾的 /。
+      const endsWithSlash = cleanPattern.endsWith('/')
+      const capture = endsWithSlash ? '(.*)' : '(/.*)?'
+      const regexFilterSub = `${cleanPattern}${capture}`
+
+      // 路径拼接逻辑：
+      // - 若源模式以 / 结尾（capture = (.*)，无前导 /），目标末尾需保留 /
+      // - 否则（capture = (/.*)?，含前导 /），目标末尾需剥掉 /，避免双 /
+      let substitutionBase = `${targetUrlObj.protocol}//${targetUrlObj.hostname}`
+      if (targetUrlObj.port) {
+        substitutionBase += `:${targetUrlObj.port}`
+      }
+      if (endsWithSlash) {
+        substitutionBase += targetUrlObj.pathname
+      } else {
+        substitutionBase += targetUrlObj.pathname.replace(/\/$/, '')
+      }
+
+      console.log(
+        `[Background] 准备规则 ID:${dnrId} (regexSubstitution): ${regexFilterSub} -> ${substitutionBase}\\1`,
+      )
+
+      return {
+        id: dnrId,
+        priority: 1,
+        action: {
+          type: 'redirect',
+          redirect: {
+            regexSubstitution: `${substitutionBase}\\1`,
+          },
+        },
+        condition: {
+          regexFilter: regexFilterSub,
+          resourceTypes: ['xmlhttprequest'],
+        },
+      }
+    }
+  } catch (error) {
+    console.error('[Background] 构建规则失败，跳过:', rule, error)
+    return null
+  }
+}
+
+// 使用 declarativeNetRequest API 更新重定向规则
 async function updateRedirectRules() {
   try {
-    console.log('[Background] 开始更新重定向规则...', currentApiUrlCache)
+    console.log('[Background] 开始更新重定向规则...', redirectRulesCache)
 
     // 获取所有现有的动态规则并移除
     const existingRules = await chrome.declarativeNetRequest.getDynamicRules()
@@ -33,8 +169,10 @@ async function updateRedirectRules() {
       console.log('[Background] 清除旧规则 IDs:', ruleIdsToRemove)
     }
 
-    // 如果没有要移除的且没有新的要添加，直接返回
-    if (!currentApiUrlCache && ruleIdsToRemove.length === 0) {
+    // 只处理启用的规则
+    const enabledRules = redirectRulesCache.filter((r) => r.enabled)
+
+    if (enabledRules.length === 0 && ruleIdsToRemove.length === 0) {
       console.log('[Background] 无变化，跳过更新')
       return
     }
@@ -44,69 +182,19 @@ async function updateRedirectRules() {
       addRules: [],
     }
 
-    // 如果有API URL，构建新规则
-    if (currentApiUrlCache) {
-      const result = await chrome.storage.local.get(['shouldShowProxy'])
-      const patterns = result.shouldShowProxy || [
-        '^https?://localhost',
-        '^https?://127\\.0\\.0\\.1',
-      ]
+    const newRules = []
+    let currentId = 1
 
-      const newRules = []
-
-      let currentId = 1
-
-      for (const pattern of patterns) {
-        try {
-          // 清理 Pattern
-          let cleanPattern = pattern
-          if (cleanPattern.startsWith('^')) {
-            cleanPattern = cleanPattern.substring(1)
-          }
-          if (cleanPattern.endsWith('$')) {
-            cleanPattern = cleanPattern.substring(0, cleanPattern.length - 1)
-          }
-
-          // 构建 Regex Filter
-          const regexFilter = `${cleanPattern}(/.*)?`
-
-          // 测试正则是否合法
-          new RegExp(regexFilter)
-
-          // 构建 Substitution
-          let targetUrl = currentApiUrlCache
-          if (targetUrl.endsWith('/')) {
-            targetUrl = targetUrl.slice(0, -1)
-          }
-
-          newRules.push({
-            id: currentId,
-            priority: 1,
-            action: {
-              type: 'redirect',
-              redirect: {
-                regexSubstitution: `${targetUrl}\\1`,
-              },
-            },
-            condition: {
-              regexFilter: regexFilter,
-              resourceTypes: ['xmlhttprequest'],
-            },
-          })
-
-          console.log(
-            `[Background] 准备规则 ID:${currentId}: ${regexFilter} -> ${targetUrl}\\1`,
-          )
-
-          currentId++ // 递增 ID
-        } catch (error) {
-          console.error('[Background] 构建规则失败，跳过模式:', pattern, error)
-        }
+    for (const rule of enabledRules) {
+      const dnrRule = buildDnrRule(rule, currentId)
+      if (dnrRule) {
+        newRules.push(dnrRule)
+        currentId++
       }
+    }
 
-      if (newRules.length > 0) {
-        updateOptions.addRules = newRules
-      }
+    if (newRules.length > 0) {
+      updateOptions.addRules = newRules
     }
 
     // 执行更新
@@ -125,6 +213,7 @@ async function updateRedirectRules() {
       // 验证规则是否真正生效
       const verifyRules = await chrome.declarativeNetRequest.getDynamicRules()
       console.log('[Background] 当前生效的规则数量:', verifyRules.length)
+      console.log('[Background] 当前生效的规则详情:', verifyRules)
     } else {
       console.log('[Background] 没有规则需要更新')
     }
@@ -133,35 +222,58 @@ async function updateRedirectRules() {
   }
 }
 
+// 判断一个 URL 是否是某个重定向规则的目标（用于请求记录）
+function findMatchingRedirectRule(url) {
+  for (const rule of redirectRulesCache) {
+    if (!rule.enabled) {
+      continue
+    }
+    try {
+      let baseTarget = rule.targetUrl
+      if (baseTarget.endsWith('/')) {
+        baseTarget = baseTarget.slice(0, -1)
+      }
+      if (url.startsWith(baseTarget)) {
+        return rule
+      }
+    } catch (e) {
+      // ignore
+    }
+  }
+  return null
+}
+
 // 监听请求完成事件，用于记录和通知
 chrome.webRequest.onCompleted.addListener(
   async (details) => {
-    // 基础校验
-    if (!currentApiUrlCache || !details.url.startsWith(currentApiUrlCache)) {
+    // 检查是否命中了某条重定向规则的目标
+    const matchedRule = findMatchingRedirectRule(details.url)
+    if (!matchedRule) {
       return
     }
 
     // 尝试还原原始 URL
-    const pathPart = details.url.substring(currentApiUrlCache.length)
+    let baseTarget = matchedRule.targetUrl
+    if (baseTarget.endsWith('/')) {
+      baseTarget = baseTarget.slice(0, -1)
+    }
+    const pathPart = details.url.substring(baseTarget.length)
 
-    // 获取配置的模式列表，用于更准确地推断原始主机
-    let originalHost = 'localhost' // 默认值
+    // 从源模式提取原始 host
+    let originalHost = 'localhost'
     try {
-      const result = await chrome.storage.local.get(['shouldShowProxy'])
-      const patterns = result.shouldShowProxy || [
-        '^https?://localhost',
-        '^https?://127\\.0\\.0\\.1',
-      ]
-
-      if (patterns.some((p) => p.includes('127.0.0.1'))) {
-        // 如果配置里明确有 127.0.0.1，且不确定，可以优先用 127.0.0.1 或者保持 localhost
+      const cleanPattern = matchedRule.sourcePattern
+        .replace(/^\^/, '')
+        .replace(/\$$/, '')
+      const match = cleanPattern.match(/\/\/([^/]+)/)
+      if (match) {
+        originalHost = match[1]
       }
-      originalHost = 'localhost'
     } catch (e) {
-      console.warn('[Background] 获取代理配置失败，使用默认 host', e)
+      // ignore
     }
 
-    const originalUrl = `http://${originalHost}${pathPart}`
+    const originalUrl = `${matchedRule.targetUrl.startsWith('https') ? 'https' : 'http'}://${originalHost}${pathPart}`
 
     // 构建消息数据
     const messageData = {
@@ -177,13 +289,12 @@ chrome.webRequest.onCompleted.addListener(
 
     // 发送消息
     if (details.tabId && details.tabId !== -1) {
-      chrome.tabs.sendMessage(details.tabId, messageData, (response) => {
+      chrome.tabs.sendMessage(details.tabId, messageData, () => {
         if (chrome.runtime.lastError) {
           // 忽略常见错误：tab 已关闭、接收端未连接等
         }
       })
     } else {
-      // 如果 tabId 无效（例如来自扩展自身或后台脚本），尝试广播给所有可见标签页
       chrome.tabs.query({}, (tabs) => {
         tabs.forEach((tab) => {
           if (tab.id) {
@@ -204,18 +315,8 @@ chrome.webRequest.onCompleted.addListener(
 
 // 消息监听
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.type === 'GET_CURRENT_API_URL') {
-    sendResponse({ currentApiUrl: currentApiUrlCache || '未找到' })
-    return true
-  }
-
-  if (message.type === 'UPDATE_API_URL') {
-    currentApiUrlCache = message.apiUrl
-    // 先更新 storage，触发 onChanged 监听器去更新规则，或者直接在这里调用
-    chrome.storage.local.set({ currentApiUrl: message.apiUrl }, () => {
-      updateRedirectRules()
-      sendResponse({ success: true })
-    })
+  if (message.type === 'GET_REDIRECT_RULES') {
+    sendResponse({ redirectRules: redirectRulesCache })
     return true
   }
 

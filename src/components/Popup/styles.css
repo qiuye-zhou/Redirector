@@ -134,10 +134,17 @@
 }
 
 .proxy-config-section h3 {
-  margin: 0 0 16px 0;
+  margin: 0 0 8px 0;
   font-size: 14px;
   font-weight: 600;
   color: #333;
+}
+
+.section-tip {
+  margin: 0 0 12px 0;
+  font-size: 11px;
+  color: #999;
+  line-height: 1.6;
 }
 
 .pattern-input-group {

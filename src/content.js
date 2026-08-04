@@ -37,20 +37,6 @@ function initialize() {
 
   // 初始化 React 应用
   initializeReactApp()
-
-  // 获取 API URL
-  chrome.runtime.sendMessage({ type: 'GET_CURRENT_API_URL' }, (response) => {
-    if (chrome.runtime.lastError) {
-      console.warn(
-        '[Content] 获取API URL失败:',
-        chrome.runtime.lastError.message,
-      )
-      return
-    }
-    if (response && response.currentApiUrl) {
-      console.log('[Content] 获取到 currentApiUrl:', response.currentApiUrl)
-    }
-  })
 }
 
 // 监听页面加载完成

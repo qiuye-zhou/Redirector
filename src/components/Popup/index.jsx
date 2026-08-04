@@ -1,12 +1,9 @@
 import React, { useState, useEffect } from 'react'
-import { useApiConfig } from '@/context/ApiConfigContext'
 import { useShouldShowProxy } from '@/hooks/useShouldShowProxy'
 import './styles.css'
 
 const Popup = () => {
-  const [status, setStatus] = useState('检查中...')
-  const [statusColor, setStatusColor] = useState('#666')
-  const [currentApiUrl, setCurrentApiUrl] = useState('')
+  const [redirectRuleCount, setRedirectRuleCount] = useState(0)
   const [newPattern, setNewPattern] = useState('')
   const [editingPattern, setEditingPattern] = useState(null)
   const [editValue, setEditValue] = useState('')
@@ -16,28 +13,21 @@ const Popup = () => {
   const packageName = process.env.PACKAGE_NAME || 'redirector'
   const buildTime = process.env.BUILD_TIME || new Date().toLocaleString()
 
-  const { addRequest } = useApiConfig()
   const { shouldShowProxy, addShouldShowProxy, removeShouldShowProxy } =
     useShouldShowProxy()
 
-  // 获取存储信息
-  const getStorageInfo = async () => {
-    try {
-      const result = await chrome.storage.local.get(['currentApiUrl'])
-
-      if (result.currentApiUrl) {
-        setCurrentApiUrl(result.currentApiUrl)
-        setStatus(`重定向地址: ${result.currentApiUrl}`)
-        setStatusColor('#81c784')
-      } else {
-        setCurrentApiUrl('')
-        setStatus('未设置重定向地址')
-        setStatusColor('#e57373')
-      }
-    } catch (error) {
-      console.error('获取存储信息失败:', error)
+  // 获取重定向规则数量（仅用于展示）
+  useEffect(() => {
+    const refresh = () => {
+      chrome.storage.local.get(['redirectRules'], (result) => {
+        const rules = result.redirectRules || []
+        setRedirectRuleCount(rules.length)
+      })
     }
-  }
+    refresh()
+    chrome.storage.onChanged.addListener(refresh)
+    return () => chrome.storage.onChanged.removeListener(refresh)
+  }, [])
 
   // 添加新的正则模式
   const handleAddPattern = () => {
@@ -74,11 +64,6 @@ const Popup = () => {
     setEditValue('')
   }
 
-  useEffect(() => {
-    // 初始化检查
-    getStorageInfo()
-  }, [])
-
   return (
     <div className="popup-container">
       <div className="popup-header">
@@ -89,27 +74,21 @@ const Popup = () => {
       <div className="popup-content">
         <div className="status-section">
           <div className="status-item">
-            <label>状态:</label>
-            <span className="status-text" style={{ color: statusColor }}>
-              {status}
-            </span>
+            <label>已配置重定向规则:</label>
+            <span className="info-value">{redirectRuleCount} 条</span>
           </div>
         </div>
 
-        <div className="info-section">
-          <div className="info-item">
-            <label>API 地址:</label>
-            <span className="info-value">{currentApiUrl || '未设置'}</span>
-          </div>
-        </div>
-
-        {/* 代理配置部分 */}
+        {/* 页面匹配模式配置 */}
         <div className="proxy-config-section">
-          <h3>代理配置</h3>
+          <h3>页面启用模式</h3>
+          <p className="section-tip">
+            匹配以下正则的页面才会显示悬浮窗工具。重定向规则请在页面内悬浮窗中配置。
+          </p>
           <div className="pattern-input-group">
             <input
               type="text"
-              placeholder="输入正则表达式模式 (如: ^https?://localhost)"
+              placeholder="输入正则 (如: ^https?://localhost 或 ^https?://shipinfor\.com)"
               value={newPattern}
               onChange={(e) => setNewPattern(e.target.value)}
               className="pattern-input"

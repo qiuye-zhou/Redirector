@@ -1,3 +1,143 @@
 .api-config {
-    padding: 20px;
+    padding: 16px;
+}
+
+.api-config-section {
+    margin-bottom: 20px;
+}
+
+.api-config-section h3 {
+    margin: 0 0 10px 0;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.rule-form {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px;
+    background: #fafafa;
+    border-radius: 6px;
+    border: 1px solid #f0f0f0;
+}
+
+.rule-form .rule-arrow {
+    text-align: center;
+    color: #999;
+    font-size: 14px;
+}
+
+.rule-form .ant-btn {
+    align-self: flex-end;
+}
+
+.empty-tip {
+    color: #999;
+    font-size: 13px;
+    padding: 16px 0;
+    text-align: center;
+}
+
+.rules-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.rule-item {
+    padding: 10px 12px;
+    border: 1px solid #f0f0f0;
+    border-radius: 6px;
+    background: #fff;
+}
+
+.rule-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.rule-item-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #333;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.rule-item-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.rule-item-body {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: #666;
+}
+
+.rule-item-source,
+.rule-item-target {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+    min-width: 0;
+}
+
+.rule-item-source {
+    color: #d4380d;
+}
+
+.rule-item-target {
+    color: #389e0d;
+}
+
+.rule-item-arrow {
+    color: #999;
+    flex-shrink: 0;
+}
+
+.api-config-tip {
+    margin-top: 16px;
+    padding: 10px 12px;
+    background: #f6ffed;
+    border: 1px solid #b7eb8f;
+    border-radius: 4px;
+    font-size: 12px;
+    color: #52c41a;
+}
+
+.api-config-tip p {
+    margin: 0 0 4px 0;
+    font-weight: 600;
+}
+
+.api-config-tip ul {
+    margin: 0;
+    padding-left: 18px;
+}
+
+.api-config-tip li {
+    line-height: 1.8;
+}
+
+.api-config-tip code {
+    background: rgba(0, 0, 0, 0.06);
+    padding: 1px 4px;
+    border-radius: 3px;
+    font-size: 11px;
+}
+
+.rule-input-name,
+.rule-input-source,
+.rule-input-target {
+    width: 100% !important;
 }
